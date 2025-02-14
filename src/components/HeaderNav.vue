@@ -1,0 +1,58 @@
+<template>
+  <v-app-bar app color="primary" dark>
+    <!-- Logo / Title -->
+    <v-app-bar-title> <v-icon left>mdi-gym</v-icon> Fitness Center </v-app-bar-title>
+
+    <!-- Navigation Links -->
+    <v-spacer></v-spacer>
+    <v-btn text to="/">Home</v-btn>
+    <v-btn text to="/classes">Classes</v-btn>
+    <v-btn text to="/trainers">Trainers</v-btn>
+    <v-btn text to="/membership">Membership</v-btn>
+    <v-btn text to="/blog">Blog</v-btn>
+
+    <v-spacer></v-spacer>
+
+    <!-- Profile Menu (Visible if Authenticated) -->
+    <v-menu v-if="isAuthenticated" offset-y>
+      <template v-slot:activator="{ props }">
+        <v-btn v-bind="props" icon>
+          <v-avatar size="36">
+            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User" />
+          </v-avatar>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item to="/profile">Profile</v-list-item>
+        <v-list-item @click="logout">Logout</v-list-item>
+      </v-list>
+    </v-menu>
+
+    <!-- Login & Sign Up Buttons (Visible if Not Authenticated) -->
+    <div v-else class="auth-buttons">
+      <v-btn to="/login" color="secondary" class="mx-2">Login</v-btn>
+      <v-btn to="/signup" color="accent" class="mx-2">Sign Up</v-btn>
+    </div>
+  </v-app-bar>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const isAuthenticated = ref(false) // Change based on your authentication state
+
+const logout = () => {
+  isAuthenticated.value = false
+  console.log('Logged out')
+}
+</script>
+
+<style scoped>
+.v-btn {
+  font-weight: bold;
+}
+.auth-buttons {
+  display: flex;
+  gap: 8px;
+}
+</style>
