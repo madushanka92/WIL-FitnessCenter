@@ -95,7 +95,7 @@ const form = ref()
 const rules = {
   required: (v: string) => !!v || 'This field is required',
   email: (v: string) => /.+@.+\..+/.test(v) || 'Invalid email',
-  password: (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+  password: (v: string) => v.length >= 8 || 'Password must be at least 8 characters',
   confirmPassword: (v: string) => v === password.value || 'Passwords do not match',
   phone: (v: string) => /^\d{10}$/.test(v) || 'Enter a valid 10-digit phone number',
 }
