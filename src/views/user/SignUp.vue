@@ -43,6 +43,7 @@
           :rules="[rules.required, rules.password]"
           outlined
           prepend-inner-icon="mdi-lock"
+          maxlength="8"
         >
           <template v-slot:append>
             <v-btn icon @click="showPassword = !showPassword">
@@ -59,6 +60,7 @@
           :rules="[rules.required, rules.confirmPassword]"
           outlined
           prepend-inner-icon="mdi-lock-check"
+          maxlength="8"
         ></v-text-field>
 
         <!-- Phone Number -->
