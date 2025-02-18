@@ -10,18 +10,20 @@
             <v-text-field
               v-model="first_name"
               label="First Name"
-              :rules="[rules.required]"
+              :rules="[rules.require, rules.firstName]"
               outlined
               prepend-inner-icon="mdi-account"
+              maxlength="15"
             ></v-text-field>
           </v-col>
           <v-col cols="6">
             <v-text-field
               v-model="last_name"
               label="Last Name"
-              :rules="[rules.required]"
+              :rules="[rules.required, rules.lastName]"
               outlined
               prepend-inner-icon="mdi-account"
+              maxlength="20"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -70,6 +72,8 @@
           :rules="[rules.required, rules.phone]"
           outlined
           prepend-inner-icon="mdi-phone"
+          maxlength="14"
+           prefix="+1 "
         ></v-text-field>
 
         <!-- Submit Button -->
@@ -99,8 +103,13 @@ const rules = {
   email: (v: string) => /.+@.+\..+/.test(v) || 'Invalid email',
   password: (v: string) =>
     (v.length >= 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
-  confirmPassword: (v: string) => v === password.value || 'Passwords do not match',
-  phone: (v: string) => /^\d{10}$/.test(v) || 'Enter a valid 10-digit phone number',
+  confirmPassword: (v: string) => v === password.value || 'Password does not match',
+  phone: (v: string) =>
+    /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) || 'Enter a valid Canadian phone number (e.g., +1 416-123-4567)',
+ firstName: (v: string) =>
+    /^[A-Za-z]{2,15}$/.test(v) || 'Only characters allowed (2-15 characters)',
+  lastName: (v: string) =>
+    /^[A-Za-z]{2,20}$/.test(v) || 'Only characters allowed (2-20 characters)',
 }
 
 const submitForm = () => {
