@@ -43,6 +43,7 @@
           :rules="[rules.required, rules.password]"
           outlined
           prepend-inner-icon="mdi-lock"
+          maxlength="8"
         >
           <template v-slot:append>
             <v-btn icon @click="showPassword = !showPassword">
@@ -59,6 +60,7 @@
           :rules="[rules.required, rules.confirmPassword]"
           outlined
           prepend-inner-icon="mdi-lock-check"
+          maxlength="8"
         ></v-text-field>
 
         <!-- Phone Number -->
@@ -95,7 +97,8 @@ const form = ref()
 const rules = {
   required: (v: string) => !!v || 'This field is required',
   email: (v: string) => /.+@.+\..+/.test(v) || 'Invalid email',
-  password: (v: string) => v.length >= 6 || 'Password must be at least 6 characters',
+  password: (v: string) =>
+    (v.length >= 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
   confirmPassword: (v: string) => v === password.value || 'Passwords do not match',
   phone: (v: string) => /^\d{10}$/.test(v) || 'Enter a valid 10-digit phone number',
 }
