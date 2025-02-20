@@ -7,4 +7,9 @@ export default [
     name: 'user-sign-up',
     component: () => lazyLoad('SignUp'),
   },
+  {
+    path: 'login',
+    name: 'user-log-in',
+    component: () => lazyLoad('Login'),
+  },
 ]
