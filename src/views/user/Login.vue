@@ -56,7 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import Cookies from 'js-cookie'
 
 const email = ref('')
 const password = ref('')
@@ -77,9 +78,23 @@ const login = () => {
       password: password.value,
       rememberMe: rememberMe.value,
     })
-    alert('Login Successful!')
+    // alert('Login Successful!')
+
+    if (rememberMe.value) {
+      Cookies.set('rememberMe', email.value, { expires: 7 }) // Expires in 7 days
+    } else {
+      Cookies.remove('rememberMe')
+    }
   }
 }
+
+onMounted(() => {
+  const savedEmail = Cookies.get('rememberMe')
+  if (savedEmail) {
+    email.value = savedEmail
+    rememberMe.value = true
+  }
+})
 </script>
 
 <style scoped>
