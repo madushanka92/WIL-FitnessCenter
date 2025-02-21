@@ -10,6 +10,13 @@ const UserService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async userLogin(user: any) {
+    const payload = user
+    const url = 'auth/login'
+
+    return await ApiService.post(url, payload)
+  }
 }
 
 export { UserService }

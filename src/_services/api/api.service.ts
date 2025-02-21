@@ -6,12 +6,12 @@ import axios, {
 } from 'axios'
 
 const handleUnauthorized = (statusCode: number): void => {
-  switch (statusCode) {
-    case 401:
-    case 403:
-      location.reload()
-      break
-  }
+  // switch (statusCode) {
+  //   case 401:
+  //   case 403:
+  //     location.reload()
+  //     break
+  // }
 }
 
 axios.interceptors.request.use(
