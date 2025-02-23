@@ -61,6 +61,9 @@
 import { onMounted, ref } from 'vue'
 import Cookies from 'js-cookie'
 import { UserService } from '@/_services/api/user/user.service'
+import { useUserAuthStore } from '@/stores/auth.module'
+import { useSnackbarStore } from '@/stores/useSnackbarStore'
+import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
@@ -70,6 +73,10 @@ const isValid = ref(false)
 const form = ref()
 const alertText = ref(undefined)
 const alertType = ref('success')
+const router = useRouter()
+
+const userAuth = useUserAuthStore()
+const snackbar = useSnackbarStore()
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
@@ -115,6 +122,11 @@ const userLogIn = async () => {
       const token = res.data.token
       // Save the token as a cookie (expires in 7 days)
       Cookies.set('token', token, { expires: 7 })
+
+      userAuth.setIsAuthenticated(true)
+
+      snackbar.notify('Redirecting...', 'success')
+      setTimeout(() => router.push('/'), 500)
     })
     .catch((err: any) => {
       if (err && err.data?.message) {
