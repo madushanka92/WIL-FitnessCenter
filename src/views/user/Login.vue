@@ -120,8 +120,10 @@ const userLogIn = async () => {
       // save it as a cookie
       // Assuming the token is in res.data.token, adjust accordingly
       const token = res.data.token
-      // Save the token as a cookie (expires in 7 days)
-      Cookies.set('token', token, { expires: 7 })
+      const refreshToken = res.data.refreshToken
+      // Save the token as a cookie
+      Cookies.set('token', token, { secure: true, sameSite: 'Strict' })
+      Cookies.set('refreshToken', refreshToken, { secure: true, sameSite: 'Strict' })
 
       userAuth.setIsAuthenticated(true)
 

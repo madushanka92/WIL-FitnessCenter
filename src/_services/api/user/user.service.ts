@@ -1,5 +1,6 @@
 import appConfig from '@/views/app-config'
 import ApiService from '../api.service'
+import Cookies from 'js-cookie'
 
 ApiService.init(appConfig.VUE_APP_ROOT_API)
 
@@ -44,6 +45,15 @@ const UserService = {
     }
     const url = 'password/reset-password/' + token
 
+    return await ApiService.post(url, payload)
+  },
+
+  async refreshUserToken() {
+    const payload = {
+      refreshToken: `${Cookies.get('refreshToken')}`,
+    }
+
+    const url = 'auth/refresh-token'
     return await ApiService.post(url, payload)
   },
 }

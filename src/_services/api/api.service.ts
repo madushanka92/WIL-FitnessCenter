@@ -1,9 +1,12 @@
+import { useUserAuthStore } from '@/stores/auth.module'
 import axios, {
   AxiosError,
   type AxiosRequestConfig,
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios'
+import { isTokenExpired } from '../helpers/tokenDecoder'
+import publicRoutes from '../helpers/publicRoutes'
 
 const handleUnauthorized = (statusCode: number): void => {
   // switch (statusCode) {
@@ -15,15 +18,30 @@ const handleUnauthorized = (statusCode: number): void => {
 }
 
 axios.interceptors.request.use(
-  (config: AxiosRequestConfig): InternalAxiosRequestConfig => {
-    // const token = TokenStorage.getToken();
-    // if (token) {
-    //     config.headers = {
-    //         ...config.headers,
-    //         Authorization: `Bearer ${TokenStorage.getToken()}`,
-    //         "x-tenant-id": TokenStorage.getTenant(),
-    //     };
-    // }
+  async (config: AxiosRequestConfig): Promise<InternalAxiosRequestConfig<any>> => {
+    const authStore = useUserAuthStore()
+    let accessToken = authStore.token
+    let refreshToken = authStore.getRefreshToken
+
+    // Check if the request URL is in the list of public routes
+    const isPublicRoute = publicRoutes.some((route) => config.url?.includes(route))
+
+    if (
+      !isPublicRoute &&
+      (!accessToken || (isTokenExpired(accessToken) && !isTokenExpired(refreshToken)))
+    ) {
+      console.log('Token expired, refreshing...')
+      await authStore.refreshToken() // Call a function to get a new token
+      accessToken = authStore.token // Get updated token
+    }
+
+    if (!isPublicRoute && accessToken) {
+      if (!config.headers) {
+        config.headers = {}
+      }
+      config.headers['Authorization'] = `Bearer ${accessToken}`
+    }
+
     return config as InternalAxiosRequestConfig
   },
   (error: AxiosError) => {
