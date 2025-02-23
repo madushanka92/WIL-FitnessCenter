@@ -22,6 +22,12 @@ const UserService = {
 
     return await ApiService.get(url)
   },
+  async userLogin(user: any) {
+    const payload = user
+    const url = 'auth/login'
+
+    return await ApiService.post(url, payload)
+  },
 }
 
 export { UserService }
