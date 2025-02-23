@@ -38,12 +38,18 @@
 
 <script setup lang="ts">
 import { useUserAuthStore } from '@/stores/auth.module'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 const userAuth = useUserAuthStore()
+const router = useRouter()
 
 const isAuthenticated = computed(() => {
   return userAuth.getIsAuthenticated
+})
+
+watch(isAuthenticated, (newVal: boolean) => {
+  if (!newVal) userAuth.logout(router)
 })
 
 const logout = () => {

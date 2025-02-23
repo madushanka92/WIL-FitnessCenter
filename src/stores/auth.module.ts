@@ -12,7 +12,9 @@ export const useUserAuthStore = defineStore('userAuth', {
   actions: {
     setIsAuthenticated(auth: boolean) {
       this.isAuthenticated = auth
-      if (!auth) Cookies.remove('token') // Ensure token is removed on logout
+      if (!auth) {
+        Cookies.remove('token') // Ensure token is removed on logout
+      }
     },
     checkAuthFromCookie() {
       this.isAuthenticated = !!Cookies.get('token') // Update state dynamically
@@ -20,21 +22,25 @@ export const useUserAuthStore = defineStore('userAuth', {
     async refreshToken() {
       try {
         const response = await UserService.refreshUserToken() // Your API endpoint
-
         this.token = response.data.token
-
         Cookies.set('token', this.token, { secure: true, sameSite: 'Strict' }) // Store new token
       } catch (error) {
         console.error('Failed to refresh token', error)
-        this.logout()
+        this.setIsAuthenticated(false)
       }
     },
-    logout() {
-      const router = useRouter()
+    logout(router: any) {
       this.token = ''
-      this.setIsAuthenticated(false)
-      setTimeout(() => router.push('/'), 100)
-      // Redirect to login page or handle logout flow
+      Cookies.remove('token')
+
+      if (router)
+        setTimeout(
+          () =>
+            router.push('/login').then(() => {
+              // location.reload()
+            }),
+          10,
+        )
     },
   },
   getters: {
