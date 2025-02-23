@@ -1,16 +1,27 @@
 <template>
   <v-container class="d-flex justify-center align-center fill-height user-login">
-    <v-card class="pa-6" elevation="10" min-width="400">
+    <v-card class="pa-6" elevation="10" min-width="560">
       <v-card-title class="text-h5 text-center">Login</v-card-title>
 
       <v-form ref="form" v-model="isValid">
         <!-- Email -->
-        <v-text-field v-model="email" label="Email" :rules="[rules.required, rules.email]" outlined
-          prepend-inner-icon="mdi-email"></v-text-field>
+        <v-text-field
+          v-model="email"
+          label="Email"
+          :rules="[rules.required, rules.email]"
+          outlined
+          prepend-inner-icon="mdi-email"
+        ></v-text-field>
 
         <!-- Password -->
-        <v-text-field v-model="password" label="Password" :type="showPassword ? 'text' : 'password'"
-          :rules="[rules.required]" outlined prepend-inner-icon="mdi-lock">
+        <v-text-field
+          v-model="password"
+          label="Password"
+          :type="showPassword ? 'text' : 'password'"
+          :rules="[rules.required]"
+          outlined
+          prepend-inner-icon="mdi-lock"
+        >
           <template v-slot:append>
             <v-btn icon @click="showPassword = !showPassword">
               <v-icon>{{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
@@ -66,8 +77,8 @@ const rules = {
 }
 
 const login = (event: Event) => {
-  event.preventDefault();
-  console.log("Event : ", event);
+  event.preventDefault()
+  console.log('Event : ', event)
   if (form.value?.validate()) {
     console.log('Logging in with:', {
       email: email.value,
@@ -77,56 +88,52 @@ const login = (event: Event) => {
     // alert('Login Successful!')
 
     if (rememberMe.value) {
-      Cookies.set('rememberMe', email.value, { expires: 7 }); // Expires in 7 days
+      Cookies.set('rememberMe', email.value, { expires: 7 }) // Expires in 7 days
     } else {
-      Cookies.remove('rememberMe');
+      Cookies.remove('rememberMe')
     }
 
-    userLogIn();
+    userLogIn()
   }
 }
 
-
-
 const userLogIn = async () => {
-  alertText.value = undefined;
+  alertText.value = undefined
   await UserService.userLogin({
     email: email.value,
     password_hash: password.value,
-  }).then((res: any) => {
-
-    if (res && res.data?.message) {
-      alertType.value = 'success';
-      alertText.value = res.data?.message;
-    }
-
-    // token
-    // save it as a cookie
-    // Assuming the token is in res.data.token, adjust accordingly
-    const token = res.data.token;
-    // Save the token as a cookie (expires in 7 days)
-    Cookies.set('token', token, { expires: 7 });
   })
+    .then((res: any) => {
+      if (res && res.data?.message) {
+        alertType.value = 'success'
+        alertText.value = res.data?.message
+      }
+
+      // token
+      // save it as a cookie
+      // Assuming the token is in res.data.token, adjust accordingly
+      const token = res.data.token
+      // Save the token as a cookie (expires in 7 days)
+      Cookies.set('token', token, { expires: 7 })
+    })
     .catch((err: any) => {
       if (err && err.data?.message) {
         alertType.value = 'error'
         alertText.value = err.data?.message
       }
-    });
-
+    })
 }
 
-
 onMounted(() => {
-  const savedEmail = Cookies.get('rememberMe');
+  const savedEmail = Cookies.get('rememberMe')
   if (savedEmail) {
-    email.value = savedEmail;
-    rememberMe.value = true;
+    email.value = savedEmail
+    rememberMe.value = true
   }
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .fill-height {
   height: 100vh;
 }
@@ -141,5 +148,11 @@ onMounted(() => {
 .forgot-password:hover,
 .sign-up-link:hover {
   text-decoration: underline;
+}
+
+.user-login {
+  > div {
+    min-width: 560px;
+  }
 }
 </style>
