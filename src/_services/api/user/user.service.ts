@@ -10,6 +10,18 @@ const UserService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async emailTokenVerification(token: any) {
+    const url = 'auth/verify-email/' + token
+
+    return await ApiService.get(url)
+  },
+
+  async resetEmailVerification(token: any, email?: any) {
+    const url = 'auth/resend-verify-email/' + token
+
+    return await ApiService.get(url)
+  },
 }
 
 export { UserService }
