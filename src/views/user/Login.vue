@@ -35,7 +35,7 @@
             <v-checkbox v-model="rememberMe" label="Remember Me" dense></v-checkbox>
           </v-col>
           <v-col cols="6" class="text-right">
-            <a href="#" class="forgot-password">Forgot Password?</a>
+            <v-btn variant="text" color="primary" to="/forgot-password"> Forgot Password? </v-btn>
           </v-col>
         </v-row>
 

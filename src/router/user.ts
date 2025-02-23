@@ -17,4 +17,14 @@ export default [
     name: 'verify-email',
     component: () => lazyLoad('verify-email'),
   },
+  {
+    path: 'forgot-password',
+    name: 'forgot-password',
+    component: () => lazyLoad('forgot-password'),
+  },
+  {
+    path: 'reset-password/:token',
+    name: 'reset-password',
+    component: () => lazyLoad('reset-password'),
+  },
 ]

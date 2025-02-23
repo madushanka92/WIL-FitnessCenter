@@ -28,6 +28,24 @@ const UserService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async forGotPassword(email: any) {
+    const payload = {
+      email: email,
+    }
+    const url = 'password/request-password-reset'
+
+    return await ApiService.post(url, payload)
+  },
+
+  async resetPassword(newPassword: any, token: any) {
+    const payload = {
+      newPassword: newPassword,
+    }
+    const url = 'password/reset-password/' + token
+
+    return await ApiService.post(url, payload)
+  },
 }
 
 export { UserService }
