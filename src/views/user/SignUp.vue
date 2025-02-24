@@ -114,7 +114,7 @@ const rules = {
     ) || 'Invalid email format',
   password: (v: string) =>
     (v.length === 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
-  confirmPassword: (v: string, password: string) => v === password || 'Password does not match',
+  confirmPassword: (v: string) => v === password.value || 'Password does not match',
   phone: (v: string) =>
     /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) ||
     'Enter a valid Canadian phone number (e.g., +1 416-123-4567)',
