@@ -10,7 +10,7 @@
             <v-text-field
               v-model="first_name"
               label="First Name"
-              :rules="[rules.require, rules.firstName]"
+              :rules="[rules.required, rules.firstName]"
               outlined
               prepend-inner-icon="mdi-account"
               maxlength="15"
