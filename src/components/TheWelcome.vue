@@ -33,13 +33,23 @@
     </v-row>
 
     <!-- Call to Action -->
-    <v-row justify="center" class="mt-10">
-      <v-btn to="/signup" color="primary" size="large">Get Started</v-btn>
+    <v-row justify="center" class="mt-10" v-if="!isAuthenticated">
+      <v-btn to="/signup" color="primary" size="large" :disabled="isAuthenticated"
+        >Get Started</v-btn
+      >
     </v-row>
   </v-container>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useUserAuthStore } from '@/stores/auth.module'
+import { computed } from 'vue'
+
+const userAuth = useUserAuthStore()
+const isAuthenticated = computed(() => {
+  return userAuth.getIsAuthenticated
+})
+</script>
 
 <style scoped>
 .v-card {

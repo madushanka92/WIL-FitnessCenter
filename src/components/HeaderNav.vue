@@ -37,13 +37,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useUserAuthStore } from '@/stores/auth.module'
+import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
-const isAuthenticated = ref(false) // Change based on your authentication state
+const userAuth = useUserAuthStore()
+const router = useRouter()
+
+const isAuthenticated = computed(() => {
+  return userAuth.getIsAuthenticated
+})
+
+watch(isAuthenticated, (newVal: boolean) => {
+  if (!newVal) userAuth.logout(router)
+})
 
 const logout = () => {
-  isAuthenticated.value = false
-  console.log('Logged out')
+  userAuth.setIsAuthenticated(false)
 }
 </script>
 

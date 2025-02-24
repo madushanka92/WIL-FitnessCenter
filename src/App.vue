@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import GlobalSnackbar from '@/components/GlobalSnackbar.vue'
 </script>
 
 <template>
@@ -7,6 +8,7 @@ import { RouterLink, RouterView } from 'vue-router'
     <component :is="$route.meta.layout">
       <div class="content">
         <router-view :key="$route.fullPath"></router-view>
+        <GlobalSnackbar />
       </div>
     </component>
   </div>

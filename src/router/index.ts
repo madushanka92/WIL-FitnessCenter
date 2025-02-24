@@ -5,8 +5,11 @@ import { defineAsyncComponent } from 'vue'
 const lazyLoad = (file: any) => import(/* webpackChunkName: "[request]" */ `@/views/${file}.vue`)
 
 const MainLayout = defineAsyncComponent(() => import('@/layouts/main-layout.vue'))
+const AdminLayout = defineAsyncComponent(() => import('@/layouts/admin-layout.vue'))
 
 import UserRoutes from './user'
+import { isCurrentUserAdmin } from '@/_services/helpers/helpers'
+import { useUserAuthStore } from '@/stores/auth.module'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,7 +17,7 @@ const router = createRouter({
     {
       path: '/',
       meta: {
-        layout: MainLayout,
+        requiresAuth: true,
       },
       children: [
         {
@@ -33,6 +36,17 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const authStore = useUserAuthStore() // Ensure store is reactive
+  const isAdmin = isCurrentUserAdmin() // Dynamically check role
+
+  if (to.meta.requiresAuth) {
+    to.meta.layout = isAdmin ? AdminLayout : MainLayout
+  }
+
+  next()
 })
 
 export default router

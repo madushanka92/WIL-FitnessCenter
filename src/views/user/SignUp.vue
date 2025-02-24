@@ -10,7 +10,7 @@
             <v-text-field
               v-model="first_name"
               label="First Name"
-              :rules="[rules.require, rules.firstName]"
+              :rules="[rules.required, rules.firstName]"
               outlined
               prepend-inner-icon="mdi-account"
               maxlength="15"
@@ -73,20 +73,26 @@
           outlined
           prepend-inner-icon="mdi-phone"
           maxlength="14"
-           prefix="+1 "
+          prefix="+1 "
         ></v-text-field>
 
         <!-- Submit Button -->
         <v-btn color="primary" block class="mt-4" :disabled="!isValid" @click="submitForm">
           <v-icon left>mdi-account-plus</v-icon> &nbsp; Sign Up
         </v-btn>
+
+        <v-alert :text="alertText" :type="alertType" closable v-if="alertText"></v-alert>
       </v-form>
     </v-card>
   </v-container>
 </template>
 
 <script setup lang="ts">
+import { UserService } from '@/_services/api/user/user.service'
+import { useUiStore } from '@/stores/ui.module'
 import { ref } from 'vue'
+
+const uiStore = useUiStore()
 
 const first_name = ref('')
 const last_name = ref('')
@@ -97,16 +103,22 @@ const phone_number = ref('')
 const showPassword = ref(false)
 const isValid = ref(false)
 const form = ref()
+const alertText = ref(undefined)
+const alertType = ref('success')
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
-  email: (v: string) => /.+@.+\..+/.test(v) || 'Invalid email',
+  email: (v: string) =>
+    /^(?!.*\.{2})(?!.*\.$)(?!^\.)[a-zA-Z0-9._%+-]+(?<!\.)@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+      v.trim(),
+    ) || 'Invalid email format',
   password: (v: string) =>
-    (v.length >= 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
+    (v.length === 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
   confirmPassword: (v: string) => v === password.value || 'Password does not match',
   phone: (v: string) =>
-    /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) || 'Enter a valid Canadian phone number (e.g., +1 416-123-4567)',
- firstName: (v: string) =>
+    /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) ||
+    'Enter a valid Canadian phone number (e.g., +1 416-123-4567)',
+  firstName: (v: string) =>
     /^[A-Za-z]{2,15}$/.test(v) || 'Only characters allowed (2-15 characters)',
   lastName: (v: string) =>
     /^[A-Za-z]{2,20}$/.test(v) || 'Only characters allowed (2-20 characters)',
@@ -121,13 +133,46 @@ const submitForm = () => {
       password: password.value,
       phone_number: phone_number.value,
     })
-    alert('Account Created Successfully!')
+    // alert('Account Created Successfully!');
+    userSignUp()
   }
+}
+
+const userSignUp = async () => {
+  alertText.value = undefined
+  uiStore.setShowOverLay(true)
+  await UserService.userSignUp({
+    first_name: first_name.value,
+    last_name: last_name.value,
+    email: email.value,
+    password_hash: password.value,
+    phone_number: phone_number.value,
+  })
+    .then((res: any) => {
+      uiStore.setShowOverLay(false)
+      if (res && res.data?.message) {
+        alertType.value = 'success'
+        alertText.value = res.data?.message
+      }
+    })
+    .catch((err: any) => {
+      uiStore.setShowOverLay(false)
+      if (err && err.data?.message) {
+        alertType.value = 'error'
+        alertText.value = err.data?.message
+      }
+    })
 }
 </script>
 
-<style scoped>
+<style lang="scss">
 .fill-height {
   height: 100vh;
+}
+
+.user-sign-up {
+  .v-alert {
+    margin-top: 15px;
+  }
 }
 </style>

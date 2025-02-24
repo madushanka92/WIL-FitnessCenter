@@ -1,0 +1,29 @@
+<template>
+  <v-app>
+    <!-- Always Open Sidebar -->
+    <v-navigation-drawer app permanent>
+      <v-list>
+        <v-list-item>
+          <v-list-item-title class="text-h6">Admin Panel</v-list-item-title>
+        </v-list-item>
+        <v-divider />
+        <v-list-item title="Dashboard" prepend-icon="mdi-view-dashboard" to="/" />
+        <v-list-item title="Profile" prepend-icon="mdi-account" to="/profile" />
+        <v-list-item title="Settings" prepend-icon="mdi-cog" to="/settings" />
+        <v-divider />
+        <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout" />
+      </v-list>
+    </v-navigation-drawer>
+
+    <!-- App Content -->
+    <v-main class="pa-4">
+      <slot />
+    </v-main>
+  </v-app>
+</template>
+
+<script setup>
+const logout = () => {
+  console.log('Logging out...')
+}
+</script>
