@@ -4,7 +4,7 @@
     <v-navigation-drawer app permanent>
       <v-list>
         <v-list-item>
-          <v-list-item-title class="text-h6">My App</v-list-item-title>
+          <v-list-item-title class="text-h6">Admin Panel</v-list-item-title>
         </v-list-item>
         <v-divider />
         <v-list-item title="Dashboard" prepend-icon="mdi-view-dashboard" to="/" />

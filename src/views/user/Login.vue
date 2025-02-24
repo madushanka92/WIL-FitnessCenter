@@ -80,7 +80,10 @@ const snackbar = useSnackbarStore()
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
-  email: (v: string) => /.+@.+\..+/.test(v) || 'Invalid email',
+  email: (v: string) =>
+    /^(?!.*\.{2})(?!.*\.$)(?!^\.)[a-zA-Z0-9._%+-]+(?<!\.)@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+      v.trim(),
+    ) || 'Invalid email format',
 }
 
 const login = (event: Event) => {

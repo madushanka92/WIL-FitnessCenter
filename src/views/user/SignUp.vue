@@ -73,7 +73,7 @@
           outlined
           prepend-inner-icon="mdi-phone"
           maxlength="14"
-           prefix="+1 "
+          prefix="+1 "
         ></v-text-field>
 
         <!-- Submit Button -->
@@ -108,13 +108,17 @@ const alertType = ref('success')
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
-  email: (v: string) => /.+@.+\..+/.test(v) || 'Invalid email',
+  email: (v: string) =>
+    /^(?!.*\.{2})(?!.*\.$)(?!^\.)[a-zA-Z0-9._%+-]+(?<!\.)@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+      v.trim(),
+    ) || 'Invalid email format',
   password: (v: string) =>
-    (v.length >= 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
-  confirmPassword: (v: string) => v === password.value || 'Password does not match',
+    (v.length === 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
+  confirmPassword: (v: string, password: string) => v === password || 'Password does not match',
   phone: (v: string) =>
-    /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) || 'Enter a valid Canadian phone number (e.g., +1 416-123-4567)',
- firstName: (v: string) =>
+    /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) ||
+    'Enter a valid Canadian phone number (e.g., +1 416-123-4567)',
+  firstName: (v: string) =>
     /^[A-Za-z]{2,15}$/.test(v) || 'Only characters allowed (2-15 characters)',
   lastName: (v: string) =>
     /^[A-Za-z]{2,20}$/.test(v) || 'Only characters allowed (2-20 characters)',
