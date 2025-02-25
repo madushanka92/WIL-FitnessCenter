@@ -10,6 +10,7 @@
         <v-list-item title="Dashboard" prepend-icon="mdi-view-dashboard" to="/" />
         <v-list-item title="Profile" prepend-icon="mdi-account" to="/profile" />
         <v-list-item title="Settings" prepend-icon="mdi-cog" to="/settings" />
+        <v-list-item title="User Roles" prepend-icon="mdi-cog" to="/user-roles" />
         <v-divider />
         <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout" />
       </v-list>
@@ -23,7 +24,10 @@
 </template>
 
 <script setup>
+import { useUserAuthStore } from '@/stores/auth.module'
+
+const userAuth = useUserAuthStore()
 const logout = () => {
-  console.log('Logging out...')
+  userAuth.setIsAuthenticated(false)
 }
 </script>

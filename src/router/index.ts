@@ -8,6 +8,7 @@ const MainLayout = defineAsyncComponent(() => import('@/layouts/main-layout.vue'
 const AdminLayout = defineAsyncComponent(() => import('@/layouts/admin-layout.vue'))
 
 import UserRoutes from './user'
+import AdminRoutes from './admin'
 import { isCurrentUserAdmin } from '@/_services/helpers/helpers'
 import { useUserAuthStore } from '@/stores/auth.module'
 
@@ -25,6 +26,7 @@ const router = createRouter({
           component: HomeView,
         },
         ...UserRoutes,
+        ...AdminRoutes,
       ],
     },
     {

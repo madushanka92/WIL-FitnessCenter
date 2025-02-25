@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <HeaderNav />
-    <v-main class="d-flex align-center justify-center fill-height">
+    <v-main class="align-center justify-center fill-height">
       <div class="admin-layout">
         <SideNav />
-        <v-container class="text-center">
+        <v-container class="text-center layout-container">
           <slot></slot>
         </v-container>
       </div>
@@ -41,6 +41,10 @@ const overlay = computed(() => {
   > div:first-child {
     min-width: 260px;
     width: 260px;
+  }
+
+  .layout-container {
+    min-width: 800px;
   }
 }
 </style>
