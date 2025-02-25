@@ -37,6 +37,20 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
+    {
+      path: '/',
+      meta: {
+        requiresAuth: false,
+        layout: MainLayout,
+      },
+      children: [
+        {
+          path: '/unauthorized',
+          name: 'unauthorized',
+          component: () => import('../views/unauthorized.vue'),
+        },
+      ],
+    },
   ],
 })
 
@@ -48,7 +62,9 @@ router.beforeEach((to, from, next) => {
     to.meta.layout = isAdmin ? AdminLayout : MainLayout
   }
 
-  next()
+  if (to.meta.isAdmin && !isAdmin) {
+    next({ name: 'unauthorized' })
+  } else next()
 })
 
 export default router

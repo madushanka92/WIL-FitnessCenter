@@ -5,6 +5,9 @@ export default [
   {
     path: 'user-roles',
     name: 'user-roles',
+    meta: {
+      isAdmin: true,
+    },
     component: () => lazyLoad('user-roles'),
   },
 ]
