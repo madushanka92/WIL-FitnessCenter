@@ -156,7 +156,10 @@ const validateAndSave = async () => {
 const saveTrainer = async () => {
   try {
     if (isEditing.value && editedTrainer.value._id) {
-      // await TrainersService.updateRole(editedRole.value._id, editedRole.value)
+      await TrainersService.updateTrainer(editedTrainer.value._id, editedTrainer.value)
+      bio_text: editedTrainer.value.bio_text,
+      // profile_image: trainers.profile_image,
+      // specialty: trainers.specialty,
       snackbar.notify('Trainer updated successfully', 'success')
     } else {
       await TrainersService.createTrainer(editedTrainer.value)
@@ -169,20 +172,6 @@ const saveTrainer = async () => {
     handleError(error, 'Error saving Trainer')
   }
 }
-
-const updateTrainer = async (trainer: Trainer) => {
-  try {
-    await TrainersService.updateTrainer(trainer._id, {
-      bio_text: trainer.bio_text,
-      profile_image: trainer.profile_image,
-      specialty: trainer.specialty,
-    })
-    snackbar.notify('Trainer updated successfully', 'success')
-  } catch (error) {
-    handleError(error, 'Failed to update trainer')
-  }
-}
-
 
 const openDialog = (role: Trainer | null = null) => {
   isEditing.value = !!role
