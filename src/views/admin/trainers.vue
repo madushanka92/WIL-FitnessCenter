@@ -14,7 +14,7 @@
 
       <template v-slot:item.actions="{ item }">
         <v-icon @click="openDialog(item)" class="mr-2">mdi-pencil</v-icon>
-        <!-- <v-icon @click="confirmDelete(item)" color="red">mdi-delete</v-icon> -->
+        <v-icon @click="confirmDelete(item)" color="red">mdi-delete</v-icon>
       </template>
     </v-data-table>
 
@@ -71,7 +71,7 @@
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
-    <!-- <v-dialog v-model="deleteDialog" max-width="400px">
+     <v-dialog v-model="deleteDialog" max-width="400px">
       <v-card>
         <v-card-title class="text-h6">Confirm Delete</v-card-title>
         <v-card-text>Are you sure you want to delete this trainer?</v-card-text>
@@ -80,7 +80,7 @@
           <v-btn color="red" @click="deleteTrainer">Delete</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog> -->
+    </v-dialog>
   </v-container>
 </template>
 
@@ -157,18 +157,32 @@ const saveTrainer = async () => {
   try {
     if (isEditing.value && editedTrainer.value._id) {
       // await TrainersService.updateRole(editedRole.value._id, editedRole.value)
-      snackbar.notify('Role updated successfully', 'success')
+      snackbar.notify('Trainer updated successfully', 'success')
     } else {
       await TrainersService.createTrainer(editedTrainer.value)
-      snackbar.notify('Role added successfully', 'success')
+      snackbar.notify('Trainer added successfully', 'success')
     }
     closeDialog()
     fetchTrainers()
     fetchUsersForTrainer()
   } catch (error) {
-    handleError(error, 'Error saving role')
+    handleError(error, 'Error saving Trainer')
   }
 }
+
+const updateTrainer = async (trainer: Trainer) => {
+  try {
+    await TrainersService.updateTrainer(trainer._id, {
+      bio_text: trainer.bio_text,
+      profile_image: trainer.profile_image,
+      specialty: trainer.specialty,
+    })
+    snackbar.notify('Trainer updated successfully', 'success')
+  } catch (error) {
+    handleError(error, 'Failed to update trainer')
+  }
+}
+
 
 const openDialog = (role: Trainer | null = null) => {
   isEditing.value = !!role
@@ -188,6 +202,23 @@ const openDialog = (role: Trainer | null = null) => {
 const closeDialog = () => {
   dialog.value = false
   editedTrainer.value = { role: '', isActive: true }
+}
+
+const confirmDelete = (trainer: Trainer) => {
+  trainerToDelete.value = trainer._id || null
+  deleteDialog.value = true
+}
+
+const deleteTrainer = async () => {
+  if (!trainerToDelete.value) return
+  try {
+    await TrainersService.deleteTrainer(trainerToDelete.value)
+    snackbar.notify('Trainer deleted successfully', 'success')
+    deleteDialog.value = false
+    fetchTrainers()
+  } catch (error) {
+    handleError(error, 'Error deleting trainer')
+  }
 }
 
 const handleError = (error: unknown, defaultMessage: string) => {
