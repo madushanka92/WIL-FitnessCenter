@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-center align-center fill-height user-login">
     <v-card class="pa-6" elevation="10" min-width="560">
-      <v-card-title class="text-h5 text-center">Login</v-card-title>
+      <v-card-title class="text-h5 text-center" data-test="login-header">Login</v-card-title>
 
       <v-form ref="form" v-model="isValid">
         <!-- Email -->
@@ -11,6 +11,8 @@
           :rules="[rules.required, rules.email]"
           outlined
           prepend-inner-icon="mdi-email"
+          name="Email"
+          data-test="email-input"
         ></v-text-field>
 
         <!-- Password -->
@@ -21,6 +23,8 @@
           :rules="[rules.required]"
           outlined
           prepend-inner-icon="mdi-lock"
+          name="Password"
+          data-test="password-input"
         >
           <template v-slot:append>
             <v-btn icon @click="showPassword = !showPassword">
@@ -40,7 +44,14 @@
         </v-row>
 
         <!-- Submit Button -->
-        <v-btn color="primary" block class="mt-4" :disabled="!isValid" @click="login($event)">
+        <v-btn
+          color="primary"
+          block
+          class="mt-4"
+          :disabled="!isValid"
+          @click="login($event)"
+          data-test="login-btn"
+        >
           <v-icon left>mdi-login</v-icon> Login
         </v-btn>
 
@@ -88,13 +99,7 @@ const rules = {
 
 const login = (event: Event) => {
   event.preventDefault()
-  console.log('Event : ', event)
   if (form.value?.validate()) {
-    console.log('Logging in with:', {
-      email: email.value,
-      password: password.value,
-      rememberMe: rememberMe.value,
-    })
     // alert('Login Successful!')
 
     if (rememberMe.value) {
@@ -131,7 +136,7 @@ const userLogIn = async () => {
       userAuth.setIsAuthenticated(true)
 
       snackbar.notify('Redirecting...', 'success')
-      setTimeout(() => router.push('/'), 500)
+      setTimeout(() => router.push('/home'), 500)
     })
     .catch((err: any) => {
       if (err && err.data?.message) {
