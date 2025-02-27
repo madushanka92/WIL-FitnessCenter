@@ -97,8 +97,8 @@ const ApiService = {
     return axios.post(resource, payload)
   },
 
-  put(resource: string, key: string, payload: any, keyFieldType: string): Promise<AxiosResponse> {
-    resource += keyFieldType === 'Guid' || keyFieldType === 'Integer' ? `(${key})` : `('${key}')`
+  put(resource: string, key: string, payload: any, keyFieldType?: string): Promise<AxiosResponse> {
+    resource += keyFieldType === 'Guid' || keyFieldType === 'Integer' ? `(${key})` : `/${key}`
     return axios.put(resource, payload)
   },
 
@@ -110,10 +110,10 @@ const ApiService = {
   delete(
     resource: string,
     key: string,
-    keyFieldType: string,
+    keyFieldType?: string,
     payload?: any,
   ): Promise<AxiosResponse> {
-    resource += keyFieldType === 'Guid' || keyFieldType === 'Integer' ? `(${key})` : `('${key}')`
+    resource += keyFieldType === 'Guid' || keyFieldType === 'Integer' ? `(${key})` : `/${key}`
     return payload ? axios.delete(resource, { data: payload }) : axios.delete(resource)
   },
 
