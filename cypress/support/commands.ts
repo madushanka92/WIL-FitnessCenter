@@ -25,15 +25,25 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
 
 export {}
+
+Cypress.Commands.add('AdminLogin', () => {
+  cy.visit('/login')
+
+  cy.get('[data-test="email-input"]').should('be.visible').type('admin@fitnthrive.com')
+  cy.get('[data-test="password-input"]').should('be.visible').type('sysadmin')
+  cy.get('button').contains('Login').click()
+
+  cy.url({ timeout: 6000 }).should('include', '/home')
+})
+
+Cypress.Commands.add('MemberLogin', () => {
+  cy.visit('/login')
+
+  cy.get('[data-test="email-input"]').should('be.visible').type('madushanka92@gmail.com')
+  cy.get('[data-test="password-input"]').should('be.visible').type('12345678')
+  cy.get('button').contains('Login').click()
+
+  cy.url({ timeout: 6000 }).should('include', '/home')
+})

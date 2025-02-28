@@ -36,7 +36,12 @@
       <v-card>
         <v-card-title>{{ isEditing ? 'Edit' : 'Add' }} Role</v-card-title>
         <v-card-text>
-          <v-text-field v-model="editedRole.role" label="Role" required></v-text-field>
+          <v-text-field
+            v-model="editedRole.role"
+            label="Role"
+            required
+            data-test="role-input"
+          ></v-text-field>
           <v-switch v-model="editedRole.isActive" label="Active"></v-switch>
         </v-card-text>
         <v-card-actions>

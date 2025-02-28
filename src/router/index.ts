@@ -25,6 +25,10 @@ const router = createRouter({
           path: '',
           component: HomeView,
         },
+        {
+          path: 'home',
+          component: HomeView,
+        },
         ...UserRoutes,
         ...AdminRoutes,
       ],
