@@ -3,12 +3,12 @@ describe('Login Page', () => {
     cy.visit('/login') // Adjust the route if necessary
   })
 
-  //   it('should display the login form', () => {
-  //     cy.get('[data-test="login-header"').contains('Login').should('be.visible')
-  //     cy.get('[data-test="email-input"]').should('be.visible')
-  //     cy.get('[data-test="password-input"]').should('be.visible')
-  //     cy.get('button').contains('Login').should('be.visible')
-  //   })
+  it('should display the login form', () => {
+    cy.get('[data-test="login-header"').contains('Login').should('be.visible')
+    cy.get('[data-test="email-input"]').should('be.visible')
+    cy.get('[data-test="password-input"]').should('be.visible')
+    cy.get('button').contains('Login').should('be.visible')
+  })
 
   it('should enable login button only when both fields are filled', () => {
     // Verify that login button is disabled initially
@@ -36,26 +36,22 @@ describe('Login Page', () => {
     cy.get('[data-test="login-btn"]').should('not.be.disabled')
   })
 
-  //   it('should show error for invalid email format', () => {
-  //     cy.get('[data-test="email-input"]').type('invalidemail')
-  //     cy.get('[data-test="password-input"]').type('password123')
-  //     cy.get('button').contains('Login').click()
-  //     cy.get('.v-messages').should('contain', 'Invalid email format')
-  //   })
+  it('should show error for invalid email formats', () => {
+    const invalidEmails = ['invalidemail', 'user@', 'user@domain', 'user@domain.', '@domain.com']
 
-  //   it('should show an error for incorrect credentials', () => {
-  //     cy.intercept('POST', '/api/login', {
-  //       statusCode: 401,
-  //       body: { message: 'Invalid email or password' },
-  //     }).as('loginRequest')
+    invalidEmails.forEach((email) => {
+      cy.get('[data-test="email-input"] input').clear()
+      cy.get('[data-test="email-input"]').type(email)
+      cy.get('.v-messages__message').should('contain', 'Invalid email format')
+    })
+  })
 
-  //     cy.get('[data-test="email-input"]').type('wrong@example.com')
-  //     cy.get('[data-test="password-input"]').type('wrongpassword')
-  //     cy.get('button').contains('Login').click()
-
-  //     cy.wait('@loginRequest')
-  //     cy.get('.v-alert').should('contain', 'Invalid email or password')
-  //   })
+  it('should show an error for incorrect credentials', () => {
+    cy.get('[data-test="email-input"]').type('wrong@example.com')
+    cy.get('[data-test="password-input"]').type('wrongpassword')
+    cy.get('button').contains('Login').click()
+    cy.get('.v-alert').should('contain', 'User not found')
+  })
 
   //   it('should log in successfully and set tokens', () => {
   //     cy.intercept('POST', '/api/login', {
@@ -82,20 +78,26 @@ describe('Login Page', () => {
   //     cy.url().should('include', '/home') // Check redirection
   //   })
 
-  //   it('should remember email if "Remember Me" is checked', () => {
-  //     cy.get('[data-test="email-input"]').type('rememberme@example.com')
-  //     cy.get('input[type="checkbox"]').check()
-  //     cy.get('button').contains('Login').click()
+  it('should remember email if "Remember Me" is checked', () => {
+    cy.get('[data-test="email-input"]').type('rememberme@example.com')
+    cy.get('[data-test="password-input"]').type('password123')
+    cy.get('input[type="checkbox"]').check()
+    cy.get('button').contains('Login').click()
 
-  //     cy.reload()
-  //     cy.get('[data-test="email-input"]').should('have.value', 'rememberme@example.com')
-  //   })
+    cy.reload()
+    cy.wait(1000) // Allow time for rehydration
 
-  //   it('should allow toggling password visibility', () => {
-  //     cy.get('[data-test="password-input"]').type('password123')
-  //     cy.get('.mdi-eye').click()
-  //     cy.get('[data-test="password-input"]').should('have.attr', 'type', 'text')
-  //     cy.get('.mdi-eye-off').click()
-  //     cy.get('[data-test="password-input"]').should('have.attr', 'type', 'password')
-  //   })
+    // Ensure input is visible before checking value
+    cy.get('[data-test="email-input"] input')
+      .should('be.visible')
+      .and('have.value', 'rememberme@example.com')
+  })
+
+  it('should allow toggling password visibility', () => {
+    cy.get('[data-test="password-input"]').type('password123')
+    cy.get('.mdi-eye').click()
+    cy.get('[data-test="password-input"] input').should('have.attr', 'type', 'text')
+    cy.get('.mdi-eye-off').click()
+    cy.get('[data-test="password-input"] input').should('have.attr', 'type', 'password')
+  })
 })
