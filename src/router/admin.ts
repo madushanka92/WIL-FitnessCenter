@@ -10,4 +10,12 @@ export default [
     },
     component: () => lazyLoad('user-roles'),
   },
+  {
+    path: 'admin-class',
+    name: 'admin-class',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('class-info'),
+  },
 ]
