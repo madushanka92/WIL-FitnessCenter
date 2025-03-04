@@ -56,6 +56,12 @@ const UserService = {
     const url = 'auth/refresh-token'
     return await ApiService.post(url, payload)
   },
+
+  async getAllUsersForTrainer() {
+    const url = 'displayusers/for-trainer'
+
+    return await ApiService.get(url)
+  },
 }
 
 export { UserService }

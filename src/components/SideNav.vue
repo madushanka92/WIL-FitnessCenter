@@ -12,6 +12,8 @@
         <v-list-item title="Settings" prepend-icon="mdi-cog" to="/settings" />
         <v-list-item title="User Roles" prepend-icon="mdi-cog" to="/user-roles" />
         <v-list-item title="Class" prepend-icon="mdi-human-capacity-decrease" to="/admin-class" />
+        <v-list-item title="Trainers" prepend-icon="mdi-cog" to="/trainers" />
+
         <v-divider />
         <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout" />
       </v-list>

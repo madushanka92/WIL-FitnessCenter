@@ -18,4 +18,12 @@ export default [
     },
     component: () => lazyLoad('class-info'),
   },
+  {
+    path: 'trainers',
+    name: 'trainers',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('trainers'),
+  },
 ]
