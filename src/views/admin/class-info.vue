@@ -2,7 +2,9 @@
   <div>
     <v-text-field v-model="searchQuery" label="Search Classes" class="mb-4" />
 
-    <v-btn color="primary" class="mb-4" @click="openDialog()">Add Class</v-btn>
+    <div class="text-left">
+      <v-btn color="primary" class="mb-4" @click="openDialog()">Add Class</v-btn>
+    </div>
 
     <v-data-table :headers="headers" :items="filteredClasses">
       <template v-slot:item.start_time="{ item }">
@@ -10,14 +12,23 @@
       </template>
 
       <template v-slot:item.status="{ item }">
-        <v-chip :color="item.status != 'cancel' ? 'green' : 'red'" class="text-center">
+        <v-chip
+          :color="
+            item.status === 'upcoming' ? 'green' : item.status === 'completed' ? 'blue' : 'red'
+          "
+          class="text-center"
+        >
           {{ item.status }}
         </v-chip>
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-icon @click="openDialog(item)" class="mr-2">mdi-pencil</v-icon>
-        <v-icon @click="deleteClass(item.id)" color="red">mdi-delete</v-icon>
+        <v-icon @click="openDialog(item)" :disabled="item.status === 'completed'" class="mr-2"
+          >mdi-pencil</v-icon
+        >
+        <v-icon @click="confirmDelete(item)" :disabled="item.status !== 'upcoming'" color="red"
+          >mdi-delete</v-icon
+        >
       </template>
     </v-data-table>
 
@@ -29,8 +40,8 @@
           <v-select
             v-model="classForm.trainer_id"
             :items="trainers"
-            item-title="user.first_name"
-            item-value="id"
+            item-title="trainer_full_name"
+            item-value="_id"
             label="Trainer"
             required
           />
@@ -52,10 +63,30 @@
             type="number"
             required
           />
+
+          <v-select
+            v-if="editMode"
+            v-model="classForm.status"
+            :items="['upcoming', 'completed', 'canceled']"
+            label="Status"
+            class="mb-4"
+          />
         </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="saveClass">Save</v-btn>
           <v-btn color="secondary" @click="dialog = false">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="400px">
+      <v-card>
+        <v-card-title class="text-h6">Confirm Delete</v-card-title>
+        <v-card-text>Are you sure you want to delete this class?</v-card-text>
+        <v-card-actions>
+          <v-btn color="gray" @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="red" @click="deleteClass">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -64,27 +95,32 @@
 
 <script lang="ts" setup>
 import { ClassService } from '@/_services/api/admin/class.service'
-// import { TrainerService } from '@/_services/api/admin/trainer.service'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import moment from 'moment'
+import { TrainersService } from '@/_services/api/admin/trainers.service'
 
 const router = useRouter()
 const searchQuery = ref('')
 const dialog = ref(false)
 const editMode = ref(false)
 const classForm = ref({
-  id: '',
-  class_name: '',
-  trainer_id: '',
-  max_capacity: '',
-  start_time: '',
-  duration_mins: '',
+  _id: '' as any,
+  class_name: '' as any,
+  trainer_id: '' as any,
+  max_capacity: '' as any,
+  start_time: '' as any,
+  duration_mins: '' as any,
+  trainer: '' as any,
+  status: '' as any,
 })
 const filteredClasses = ref([])
 const trainers = ref([])
 const snackbar = useSnackbarStore()
+const deleteDialog = ref(false)
+const classToDelete = ref<string | null>(null)
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const headers = ref([
   { title: 'Class Name', value: 'class_name' },
@@ -106,9 +142,16 @@ onMounted(() => {
   fetchTrainers()
 })
 
+watch(searchQuery, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    fetchClass()
+  }, 500) // Adjust delay as needed
+})
+
 const fetchClass = async () => {
   try {
-    const { data } = await ClassService.getAllClass()
+    const { data } = await ClassService.getAllClass({ search: searchQuery.value })
     filteredClasses.value = data.map((cls: any) => ({
       ...cls,
       trainer_full_name: cls.trainer?.user
@@ -122,8 +165,11 @@ const fetchClass = async () => {
 
 const fetchTrainers = async () => {
   try {
-    // const { data } = await TrainerService.getAllTrainers()
-    // trainers.value = data
+    const { data } = await TrainersService.getAllTrainers()
+    trainers.value = data.map((t: any) => ({
+      ...t,
+      trainer_full_name: t.user_id ? `${t.user_id?.first_name} ${t.user_id?.last_name}` : 'N/A',
+    }))
   } catch (error) {
     snackbar.handleError(error, 'Failed to fetch trainers')
   }
@@ -131,28 +177,39 @@ const fetchTrainers = async () => {
 
 const openDialog = (
   cls = {
-    id: '',
+    _id: '',
     class_name: '',
     trainer_id: '',
     max_capacity: '',
     start_time: '',
     duration_mins: '',
+    trainer: '' as any,
   },
 ) => {
   classForm.value = {
     ...cls,
     start_time: cls.start_time ? moment(cls.start_time).format('YYYY-MM-DDTHH:mm') : '', // Convert to proper format
+    trainer_id: cls.trainer?._id,
   }
-  editMode.value = !!cls.id
+
+  editMode.value = !!cls._id
   dialog.value = true
 }
 
 const saveClass = async () => {
   try {
     if (editMode.value) {
-      //   await ClassService.updateClass(classForm.value.id, classForm.value)
+      const payload = {
+        trainer_id: classForm.value.trainer_id,
+        class_name: classForm.value.class_name,
+        max_capacity: classForm.value.max_capacity,
+        start_time: classForm.value.start_time,
+        duration_mins: classForm.value.duration_mins,
+        status: classForm.value.status,
+      }
+      await ClassService.updateClass(classForm.value._id, payload)
     } else {
-      //   await ClassService.createClass(classForm.value)
+      await ClassService.createClass(classForm.value)
     }
     snackbar.showSuccess('Class saved successfully')
     dialog.value = false
@@ -162,15 +219,21 @@ const saveClass = async () => {
   }
 }
 
-const deleteClass = async (id: string) => {
-  if (confirm('Are you sure you want to delete this class?')) {
-    try {
-      //   await ClassService.deleteClass(id)
-      snackbar.showSuccess('Class deleted successfully')
-      fetchClass()
-    } catch (error) {
-      snackbar.handleError(error, 'Failed to delete class')
-    }
+const confirmDelete = (cls: any) => {
+  classToDelete.value = cls._id || null
+  deleteDialog.value = true
+}
+
+const deleteClass = async () => {
+  deleteDialog.value = false
+  if (!classToDelete.value) return
+
+  try {
+    await ClassService.deleteClass(classToDelete.value)
+    snackbar.showSuccess('Class deleted successfully')
+    fetchClass()
+  } catch (error) {
+    snackbar.handleError(error, 'Failed to delete class')
   }
 }
 
