@@ -28,7 +28,44 @@
           {{ item.status }}
         </v-chip>
       </template>
+
+      <template v-slot:item.actions="{ item }">
+        <v-btn color="primary" @click="openClassDetails(item)">View</v-btn>
+      </template>
     </v-data-table>
+
+    <v-dialog v-model="isDialogOpen" max-width="600px">
+      <v-card>
+        <v-card-title>Class Details</v-card-title>
+        <v-card-text>
+          <p v-if="selectedClass"><strong>Class Name:</strong> {{ selectedClass.class_name }}</p>
+          <p v-if="selectedClass">
+            <strong>Trainer:</strong> {{ selectedClass.trainer_full_name }}
+          </p>
+          <p v-if="selectedClass">
+            <strong>Start Time:</strong> {{ formatDate(selectedClass.start_time) }}
+          </p>
+          <p v-if="selectedClass">
+            <strong>Duration:</strong> {{ selectedClass.duration_mins }} mins
+          </p>
+          <p v-if="selectedClass"><strong>Status:</strong> {{ selectedClass.status }}</p>
+          <p v-if="selectedClass">
+            <strong>Available Slots:</strong> {{ selectedClass.remaining_spots }}
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="green"
+            @click="bookClass"
+            :disabled="
+              !selectedClass || !selectedClass.remaining_spots || selectedClass.status != 'upcoming'
+            "
+            >Book Class</v-btn
+          >
+          <v-btn color="red" @click="isDialogOpen = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -40,8 +77,19 @@ import { ClassService } from '@/_services/api/admin/class.service'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
 
 const searchQuery = ref('')
-const filteredClasses = ref([])
+interface Class {
+  class_name: string
+  trainer_full_name: string
+  start_time: string
+  duration_mins: number
+  status: string
+  remaining_spots: number
+}
+
+const filteredClasses = ref<Class[]>([])
 const snackbar = useSnackbarStore()
+const isDialogOpen = ref(false)
+const selectedClass = ref<any>(null)
 
 const headers = ref([
   { title: 'Class Name', key: 'class_name' },
@@ -49,6 +97,7 @@ const headers = ref([
   { title: 'Start Time', key: 'start_time' },
   { title: 'Duration', key: 'duration_mins' },
   { title: 'Status', key: 'status' },
+  { title: 'Actions', key: 'actions', sortable: false },
 ])
 
 const fetchClasses = async () => {
@@ -71,6 +120,16 @@ const formatDate = (date: any) => moment(date).format('YYYY-MM-DD HH:mm A')
 
 const statusColor = (status: string) => {
   return status === 'upcoming' ? 'green' : status === 'completed' ? 'blue' : 'red'
+}
+
+const openClassDetails = (cls: any) => {
+  selectedClass.value = cls
+  isDialogOpen.value = true
+}
+
+const bookClass = () => {
+  snackbar.showSuccess('Class booked successfully!')
+  isDialogOpen.value = false
 }
 
 onMounted(fetchClasses)
