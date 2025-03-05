@@ -5,8 +5,8 @@
 
     <!-- Navigation Links -->
     <v-spacer></v-spacer>
-    <v-btn text to="/">Home</v-btn>
-    <v-btn text to="/classes">Classes</v-btn>
+    <v-btn text to="/home">Home</v-btn>
+    <v-btn text to="/class-list">Classes</v-btn>
     <v-btn text to="/trainers-list">Trainers</v-btn>
     <v-btn text to="/membership">Membership</v-btn>
     <v-btn text to="/blog">Blog</v-btn>
