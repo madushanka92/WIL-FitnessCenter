@@ -9,7 +9,8 @@ const AdminLayout = defineAsyncComponent(() => import('@/layouts/admin-layout.vu
 
 import UserRoutes from './user'
 import AdminRoutes from './admin'
-import TrainerRoutes from "./trainer"
+import TrainerRoutes from './trainer'
+import ClassRoutes from './class'
 import { isCurrentUserAdmin } from '@/_services/helpers/helpers'
 import { useUserAuthStore } from '@/stores/auth.module'
 
@@ -32,7 +33,8 @@ const router = createRouter({
         },
         ...UserRoutes,
         ...AdminRoutes,
-        ...TrainerRoutes
+        ...TrainerRoutes,
+        ...ClassRoutes,
       ],
     },
     {
