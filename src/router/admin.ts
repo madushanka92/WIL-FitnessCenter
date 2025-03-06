@@ -19,6 +19,14 @@ export default [
     component: () => lazyLoad('class-info'),
   },
   {
+    path: 'view-users',
+    name: 'view-users',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('view-users'),
+  },
+  {
     path: 'trainers',
     name: 'trainers',
     meta: {
