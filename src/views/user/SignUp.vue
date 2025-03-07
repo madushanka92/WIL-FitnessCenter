@@ -126,13 +126,6 @@ const rules = {
 
 const submitForm = () => {
   if (form.value?.validate()) {
-    console.log('Form submitted:', {
-      first_name: first_name.value,
-      last_name: last_name.value,
-      email: email.value,
-      password: password.value,
-      phone_number: phone_number.value,
-    })
     // alert('Account Created Successfully!');
     userSignUp()
   }

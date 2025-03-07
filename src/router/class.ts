@@ -4,7 +4,7 @@ const lazyLoad = (file: any) =>
 export default [
   {
     path: 'class-list',
-    name: 'user-roles',
+    name: 'class-list',
     component: () => lazyLoad('class'),
   },
 ]

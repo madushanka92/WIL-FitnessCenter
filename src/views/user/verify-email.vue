@@ -65,7 +65,6 @@ const goToLogin = () => {
 }
 
 onMounted(() => {
-  console.log('A >> ', route)
   token.value = route.params?.token as string | null
   verifyEmailToken()
 })

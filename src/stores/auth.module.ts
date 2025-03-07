@@ -14,6 +14,7 @@ export const useUserAuthStore = defineStore('userAuth', {
       this.isAuthenticated = auth
       if (!auth) {
         Cookies.remove('token') // Ensure token is removed on logout
+        Cookies.remove('refreshToken')
       }
     },
     checkAuthFromCookie() {
