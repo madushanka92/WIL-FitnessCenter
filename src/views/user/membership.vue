@@ -101,7 +101,6 @@ onMounted(async () => {
 })
 
 const SelectMembership = (membership: any) => {
-  console.log('A > ', membership)
   if (userAuth.getIsAuthenticated) {
     amount.value = membership.price.$numberDecimal
     showPaymentModal.value = true // Show payment modal
