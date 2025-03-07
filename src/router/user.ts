@@ -32,4 +32,9 @@ export default [
     name: 'membership-list',
     component: () => lazyLoad('membership'),
   },
+  {
+    path: 'checkout',
+    name: 'checkout',
+    component: () => lazyLoad('checkout'),
+  },
 ]
