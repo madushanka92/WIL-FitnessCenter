@@ -62,6 +62,12 @@ const UserService = {
 
     return await ApiService.get(url)
   },
+
+  async updateUserData(id: any, payload: any) {
+    const url = 'user'
+
+    return await ApiService.put(url, id, payload)
+  },
 }
 
 export { UserService }

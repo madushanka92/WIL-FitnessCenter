@@ -9,7 +9,13 @@
           md="4"
           class="d-flex align-stretch"
         >
-          <v-card class="membership-card" :class="getCardColor(membership.membership_name)">
+          <v-card
+            class="membership-card"
+            :class="[
+              getCardColor(membership.membership_name),
+              membershipID === membership._id ? 'active-membership' : '',
+            ]"
+          >
             <v-card-title class="text-h5 font-weight-bold text-center">
               {{ capitalizeWords(membership.membership_name) }}
             </v-card-title>
@@ -24,9 +30,14 @@
               >
             </v-card-text>
             <v-card-actions class="justify-center">
-              <v-btn color="primary" variant="flat" @click="SelectMembership(membership)"
-                >Choose Plan</v-btn
+              <v-btn
+                color="primary"
+                variant="flat"
+                @click="SelectMembership(membership)"
+                :disabled="membershipID || membershipID === membership._id"
               >
+                {{ membershipID === membership._id ? 'Active Membership' : 'Choose Plan' }}
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -50,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { MembershipService } from '@/_services/api/user/membership.service'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
 import { useUserAuthStore } from '@/stores/auth.module'
@@ -58,11 +69,16 @@ import { useRouter } from 'vue-router'
 import { loadStripe, StripeElements, Stripe } from '@stripe/stripe-js'
 import { PaymentService } from '@/_services/api/user/payment.service'
 import { nextTick } from 'process'
+import { UserService } from '@/_services/api/user/user.service'
+import { getUserID, getUserMembership } from '@/_services/helpers/helpers'
+import { useUiStore } from '@/stores/ui.module'
 
 const filteredMemberships = ref([] as any)
 const snackbar = useSnackbarStore()
 const userAuth = useUserAuthStore()
 const router = useRouter()
+
+const uiStore = useUiStore()
 const showPaymentModal = ref(false)
 const stripeKey =
   'pk_test_51Qzo3tRAUpFKKzR0Rvx02BDNy9pZqDyJFhLGiThHWuDSWkxBQjD0ZZL0HHyd41M0mF75RtaLid9h3TmqSvAiKIZ600rRh4Kazj'
@@ -71,6 +87,7 @@ const elements = ref<StripeElements | null>(null)
 const cardElement = ref(null)
 const loading = ref(false)
 const amount = ref(0)
+const selectedMembership = ref(null)
 
 const fetchMemberships = async () => {
   try {
@@ -80,6 +97,8 @@ const fetchMemberships = async () => {
     snackbar.handleError(error, 'Failed to fetch memberships')
   }
 }
+
+const membershipID = ref(getUserMembership())
 
 const formatPrice = (price: any) => parseFloat(price.$numberDecimal.toString()).toFixed(2)
 
@@ -101,6 +120,7 @@ onMounted(async () => {
 })
 
 const SelectMembership = (membership: any) => {
+  selectedMembership.value = membership._id
   if (userAuth.getIsAuthenticated) {
     amount.value = membership.price.$numberDecimal
     showPaymentModal.value = true // Show payment modal
@@ -135,6 +155,8 @@ const SelectMembership = (membership: any) => {
 
 const handlePayment = async () => {
   loading.value = true
+
+  uiStore.setShowOverLay(true)
   try {
     const { data } = await PaymentService.createPayment({
       amount: amount.value,
@@ -154,10 +176,23 @@ const handlePayment = async () => {
     } else if (paymentIntent.status === 'succeeded') {
       snackbar.showSuccess('Payment successful !')
       showPaymentModal.value = false // Close modal after success
+
+      const userUpdate = await UserService.updateUserData(getUserID(), {
+        membership_id: selectedMembership.value,
+      })
+
+      if (userUpdate?.data?.success) {
+        await userAuth.refreshToken()
+        nextTick(() => {
+          membershipID.value = selectedMembership.value
+        })
+      }
     }
   } catch (error) {
+    uiStore.setShowOverLay(false)
     console.error(error)
   } finally {
+    uiStore.setShowOverLay(false)
     loading.value = false
   }
 }
@@ -170,42 +205,60 @@ const handlePayment = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
 
-.membership-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 24px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+  .membership-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 
-.premium-card {
-  background: linear-gradient(135deg, #ff9800, #ff5722);
-  color: white;
-}
+  .premium-card {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    color: white;
+  }
 
-.basic-card {
-  background: linear-gradient(135deg, #03a9f4, #0288d1);
-  color: white;
-}
+  .basic-card {
+    background: linear-gradient(135deg, #03a9f4, #0288d1);
+    color: white;
+  }
 
-.standard-card {
-  background: linear-gradient(135deg, #4caf50, #388e3c);
-  color: white;
-}
+  .standard-card {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+  }
 
-.membership-description {
-  font-size: 14px;
-  opacity: 0.9;
-}
+  .membership-description {
+    font-size: 14px;
+    opacity: 0.9;
+  }
 
-.stripe-card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
+  .stripe-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .active-membership {
+    border: 3px solid #ffd700; // Gold border for active membership
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    position: relative;
+  }
+
+  .active-membership::before {
+    content: 'Active';
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    background: #ffd700;
+    color: #000;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 5px;
+  }
 }
 </style>
