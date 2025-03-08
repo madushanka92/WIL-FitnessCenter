@@ -27,6 +27,15 @@ export default [
     component: () => lazyLoad('view-users'),
   },
   {
+    path: 'view-testimonials',
+    name: 'view-testimonials',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('view-testimonials'),
+  },
+  
+  {
     path: 'trainers',
     name: 'trainers',
     meta: {
