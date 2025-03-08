@@ -3,19 +3,18 @@ import ApiService from '../api.service'
 
 ApiService.init(appConfig.VUE_APP_ROOT_API)
 
-const PaymentService = {
-  async createPayment(user: any) {
-    const payload = user
-    const url = 'payment'
+const ClassBookingService = {
+  async bookClass(payload: any) {
+    const url = 'class-booking'
 
     return await ApiService.post(url, payload)
   },
 
-  async updateMembershipPayment(payload: any) {
-    const url = 'payment/membership'
+  async cancelClassBooking(payload: any) {
+    const url = 'class-booking/cancel'
 
     return await ApiService.post(url, payload)
   },
 }
 
-export { PaymentService }
+export { ClassBookingService }

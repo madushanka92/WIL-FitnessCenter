@@ -25,12 +25,19 @@
 
       <template v-slot:item.status="{ item }">
         <v-chip :color="statusColor(item.status)" class="text-center">
-          {{ item.status }}
+          {{ capitalizeWords(item.status) }}
         </v-chip>
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-btn color="primary" @click="openClassDetails(item)">View</v-btn>
+        <v-btn
+          v-if="item.user_status != 'booked'"
+          color="primary"
+          @click="openClassDetails(item)"
+          width="80"
+          >View</v-btn
+        >
+        <v-btn v-else color="error" @click="cancelBooking(item)" width="80">Cancel</v-btn>
       </template>
     </v-data-table>
 
@@ -48,7 +55,10 @@
           <p v-if="selectedClass">
             <strong>Duration:</strong> {{ selectedClass.duration_mins }} mins
           </p>
-          <p v-if="selectedClass"><strong>Status:</strong> {{ selectedClass.status }}</p>
+          <p v-if="selectedClass">
+            <strong>Status:</strong>
+            {{ capitalizeWords(selectedClass.user_status || selectedClass.status) }}
+          </p>
           <p v-if="selectedClass">
             <strong>Available Slots:</strong> {{ selectedClass.remaining_spots }}
           </p>
@@ -75,6 +85,9 @@ import { debounce } from 'lodash'
 import moment from 'moment'
 import { ClassService } from '@/_services/api/admin/class.service'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
+import { ClassBookingService } from '@/_services/api/user/class.booking.service'
+import { useUiStore } from '@/stores/ui.module'
+import { nextTick } from 'process'
 
 const searchQuery = ref('')
 interface Class {
@@ -84,12 +97,18 @@ interface Class {
   duration_mins: number
   status: string
   remaining_spots: number
+  user_status: string
 }
 
 const filteredClasses = ref<Class[]>([])
 const snackbar = useSnackbarStore()
 const isDialogOpen = ref(false)
+const uiStore = useUiStore()
 const selectedClass = ref<any>(null)
+
+const capitalizeWords = (str: string) => {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase())
+}
 
 const headers = ref([
   { title: 'Class Name', key: 'class_name' },
@@ -119,7 +138,13 @@ const debouncedFetchClasses = debounce(fetchClasses, 500)
 const formatDate = (date: any) => moment(date).format('YYYY-MM-DD HH:mm A')
 
 const statusColor = (status: string) => {
-  return status === 'upcoming' ? 'green' : status === 'completed' ? 'blue' : 'red'
+  return status === 'upcoming'
+    ? 'green'
+    : status === 'completed'
+      ? 'blue'
+      : status === 'booked'
+        ? 'orange'
+        : 'red'
 }
 
 const openClassDetails = (cls: any) => {
@@ -127,9 +152,39 @@ const openClassDetails = (cls: any) => {
   isDialogOpen.value = true
 }
 
-const bookClass = () => {
-  snackbar.showSuccess('Class booked successfully!')
-  isDialogOpen.value = false
+const bookClass = async () => {
+  uiStore.setShowOverLay(true)
+  try {
+    const { data } = await ClassBookingService.bookClass({
+      class_id: selectedClass.value,
+    })
+
+    if (data.success) snackbar.showSuccess('Class booked successfully!')
+    nextTick(() => {
+      fetchClasses()
+    })
+  } catch (error) {
+    snackbar.handleError(error, 'Class booking failed !')
+  } finally {
+    isDialogOpen.value = false
+    uiStore.setShowOverLay(false)
+  }
+}
+
+const cancelBooking = async (cls: any) => {
+  uiStore.setShowOverLay(true)
+  try {
+    const { data } = await ClassBookingService.cancelClassBooking({
+      class_id: cls._id,
+    })
+    if (data.success) snackbar.showSuccess('Class cancelled successfully!')
+    nextTick(() => {
+      fetchClasses()
+    })
+  } catch (error) {
+  } finally {
+    uiStore.setShowOverLay(false)
+  }
 }
 
 onMounted(fetchClasses)

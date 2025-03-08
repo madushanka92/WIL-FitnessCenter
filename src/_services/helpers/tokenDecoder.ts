@@ -3,6 +3,8 @@ import { jwtDecode } from 'jwt-decode'
 interface DecodedToken {
   exp?: number
   role?: string
+  _id: any
+  membership_id: any
 }
 
 function decodeToken(token: string | null): DecodedToken | null {
@@ -21,4 +23,12 @@ export function isTokenExpired(token: string): boolean {
 
 export function isUserAdmin(token: string): boolean {
   return decodeToken(token)?.role === 'admin'
+}
+
+export function decodeUserId(token: string) {
+  return decodeToken(token)?._id
+}
+
+export function isUseraMember(token: string) {
+  return decodeToken(token)?.membership_id
 }

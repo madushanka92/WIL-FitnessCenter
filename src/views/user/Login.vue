@@ -75,6 +75,7 @@ import { UserService } from '@/_services/api/user/user.service'
 import { useUserAuthStore } from '@/stores/auth.module'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
 import { useRouter } from 'vue-router'
+import { getUserMembership } from '@/_services/helpers/helpers'
 
 const email = ref('')
 const password = ref('')
@@ -135,8 +136,11 @@ const userLogIn = async () => {
 
       userAuth.setIsAuthenticated(true)
 
+      const membershipID = ref(getUserMembership())
+
       snackbar.notify('Redirecting...', 'success')
-      setTimeout(() => router.push('/home'), 500)
+      if (membershipID.value) setTimeout(() => router.push('/home'), 500)
+      else setTimeout(() => router.push('/membership-list'), 500)
     })
     .catch((err: any) => {
       if (err && err.data?.message) {

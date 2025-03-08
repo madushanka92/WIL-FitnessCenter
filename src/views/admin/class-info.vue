@@ -131,6 +131,7 @@ const headers = ref([
     cellClass: 'text-left',
   },
   { title: 'Capacity', key: 'max_capacity' },
+  { title: 'Remaining', key: 'remaining_spots' },
   { title: 'Start Time', key: 'start_time' },
   { title: 'Duration', key: 'duration_mins' },
   { title: 'Status', key: 'status', align: 'center' },
