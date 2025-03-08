@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+  <v-container>
     <v-row justify="center">
       <v-col cols="12" md="10">
         <v-text-field
@@ -10,18 +10,14 @@
           prepend-inner-icon="mdi-magnify"
           class="mb-4"
         ></v-text-field>
-        </v-col>
-        </v-row>
-        </v-container>
-
-  <v-container>
+      </v-col>
+    </v-row>
     <v-row justify="center">
       <v-col cols="12" md="10">
         <v-card class="trainer-profile">
           <v-slide-group show-arrows>
             <!-- <v-slide-group-item v-for="trainer in trainers" :key="trainer._id"> -->
-              <v-slide-group-item v-for="trainer in filteredTrainers" :key="trainer._id">
-
+            <v-slide-group-item v-for="trainer in filteredTrainers" :key="trainer._id">
               <v-card class="profile-content mx-3">
                 <v-avatar size="120" class="mx-auto">
                   <v-img :src="trainer.profile_image_url" alt="Trainer Profile"></v-img>
@@ -43,17 +39,16 @@
 <script lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { TrainersService } from '@/_services/api/admin/trainers.service'
-import appConfig from '../app-config';
+import appConfig from '../app-config'
 
 export default {
   setup() {
     const trainers = ref([])
-    const search = ref("")
+    const search = ref('')
 
     onMounted(async () => {
       try {
         const response = await TrainersService.getAllTrainers()
-        console.log('Trainer data:', response.data)
         response.data.forEach((element: any) => {
           element.full_name = element.user_id.first_name + ' ' + element.user_id.last_name
 
@@ -64,24 +59,24 @@ export default {
       } catch (error) {
         console.error('Error fetching trainer profile:', error)
       }
-    });
+    })
 
     // 🛠 Computed Property for Filtering Trainers
-const filteredTrainers = computed(() => {
-  if (!search.value) return trainers.value; // If search is empty, return all trainers
+    const filteredTrainers = computed(() => {
+      if (!search.value) return trainers.value // If search is empty, return all trainers
 
-  return trainers.value.filter((trainer: any) => {
-    const nameMatch = trainer.full_name.toLowerCase().includes(search.value.toLowerCase());
-    const specialtyMatch = trainer.specialty?.toLowerCase().includes(search.value.toLowerCase());
+      return trainers.value.filter((trainer: any) => {
+        const nameMatch = trainer.full_name.toLowerCase().includes(search.value.toLowerCase())
+        const specialtyMatch = trainer.specialty?.toLowerCase().includes(search.value.toLowerCase())
 
-    return nameMatch || specialtyMatch; // Match by name OR specialty
-  });
-});
+        return nameMatch || specialtyMatch // Match by name OR specialty
+      })
+    })
 
-return { trainers, search, filteredTrainers };
+    return { trainers, search, filteredTrainers }
 
     // return { trainers }
-  }
+  },
 }
 </script>
 

@@ -27,4 +27,14 @@ export default [
     name: 'reset-password',
     component: () => lazyLoad('reset-password'),
   },
+  {
+    path: 'membership-list',
+    name: 'membership-list',
+    component: () => lazyLoad('membership'),
+  },
+  {
+    path: 'checkout',
+    name: 'checkout',
+    component: () => lazyLoad('checkout'),
+  },
 ]

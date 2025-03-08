@@ -14,7 +14,7 @@ export const useSnackbarStore = defineStore('snackbar', {
       this.timeout = timeout
       this.show = true
     },
-    handleError(error: unknown, defaultMessage: string) {
+    handleError(error: unknown, defaultMessage?: string) {
       const message = (error as any)?.data?.message || defaultMessage
       this.notify(message, 'error')
     },
