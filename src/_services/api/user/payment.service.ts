@@ -10,6 +10,12 @@ const PaymentService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async updateMembershipPayment(payload: any) {
+    const url = 'payment/membership'
+
+    return await ApiService.post(url, payload)
+  },
 }
 
 export { PaymentService }

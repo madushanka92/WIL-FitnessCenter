@@ -68,6 +68,12 @@ const UserService = {
 
     return await ApiService.put(url, id, payload)
   },
+
+  async validateDiscount(payload: any) {
+    const url = 'promotion/apply'
+
+    return await ApiService.post(url, payload)
+  },
 }
 
 export { UserService }

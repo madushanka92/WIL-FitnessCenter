@@ -49,6 +49,23 @@
       <v-card>
         <v-card-title>Complete Your Payment</v-card-title>
         <v-card-text>
+          <v-text-field
+            v-model="discountCode"
+            label="Enter Discount Code"
+            outlined
+            dense
+            clearable
+            @blur="applyDiscount"
+          ></v-text-field>
+          <p v-if="discountAmount > 0" class="discount-text">
+            <span>
+              Discount Applied: <strong>${{ discountAmount }}</strong></span
+            >
+
+            <span
+              >Total : <strong>${{ getTotalPayment(amount, discountAmount) }}</strong></span
+            >
+          </p>
           <div ref="cardElement" class="stripe-card"></div>
         </v-card-text>
         <v-card-actions>
@@ -88,6 +105,8 @@ const cardElement = ref(null)
 const loading = ref(false)
 const amount = ref(0)
 const selectedMembership = ref(null)
+const discountCode = ref('')
+const discountAmount = ref(0) as any
 
 const fetchMemberships = async () => {
   try {
@@ -100,7 +119,7 @@ const fetchMemberships = async () => {
 
 const membershipID = ref(getUserMembership())
 
-const formatPrice = (price: any) => parseFloat(price.$numberDecimal.toString()).toFixed(2)
+const formatPrice = (price: any) => parseFloat(price?.$numberDecimal?.toString()).toFixed(2)
 
 const getCardColor = (name: string) => {
   if (name.toLowerCase().includes('premium')) return 'premium-card'
@@ -120,6 +139,7 @@ onMounted(async () => {
 })
 
 const SelectMembership = (membership: any) => {
+  discountAmount.value = 0
   selectedMembership.value = membership._id
   if (userAuth.getIsAuthenticated) {
     amount.value = membership.price.$numberDecimal
@@ -160,6 +180,7 @@ const handlePayment = async () => {
   try {
     const { data } = await PaymentService.createPayment({
       amount: amount.value,
+      discountCode: discountCode.value,
       currency: 'cad',
     })
 
@@ -177,11 +198,16 @@ const handlePayment = async () => {
       snackbar.showSuccess('Payment successful !')
       showPaymentModal.value = false // Close modal after success
 
-      const userUpdate = await UserService.updateUserData(getUserID(), {
+      const membershipPaymnet = await PaymentService.updateMembershipPayment({
         membership_id: selectedMembership.value,
+        amount: paymentIntent.amount / 100,
+        payment_method: 'stripe',
+        transaction_id: paymentIntent.id,
+        discountCode: discountCode.value,
+        amountBeforeDiscount: amount.value,
       })
 
-      if (userUpdate?.data?.success) {
+      if (membershipPaymnet?.data?.success) {
         await userAuth.refreshToken()
         nextTick(() => {
           membershipID.value = selectedMembership.value
@@ -190,15 +216,58 @@ const handlePayment = async () => {
     }
   } catch (error) {
     uiStore.setShowOverLay(false)
-    console.error(error)
+    snackbar.handleError(error, 'Payment Failed')
   } finally {
     uiStore.setShowOverLay(false)
     loading.value = false
   }
 }
+
+const applyDiscount = async () => {
+  if (!discountCode.value) {
+    discountAmount.value = 0
+    return
+  }
+
+  try {
+    const { data } = await UserService.validateDiscount({ promo_code: discountCode.value })
+    if (data.success && data.promotion) {
+      const percentage = data.promotion.percentage
+
+      discountAmount.value = Math.floor(amount.value * (parseFloat(percentage) / 100) * 100) / 100
+
+      snackbar.showSuccess(`Discount Applied: $${discountAmount.value}`)
+    } else {
+      discountAmount.value = 0
+      snackbar.handleError(null, 'Invalid Discount Code')
+    }
+  } catch (error) {
+    snackbar.handleError(error, 'Failed to validate discount')
+  }
+}
+
+const getTotalPayment = (amount: any, discount: any) => {
+  return (Math.floor((parseFloat(amount) - parseFloat(discount)) * 100) / 100).toFixed(2)
+}
 </script>
 
 <style lang="scss" scoped>
+.stripe-card {
+  padding: 12px;
+  border: 1px solid #205d0f;
+}
+
+.discount-text {
+  padding-bottom: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  > span {
+    display: flex;
+    justify-content: space-between;
+  }
+}
 .membership-container {
   min-height: 50vh;
   padding: 32px;
