@@ -21,6 +21,7 @@ export const useUserAuthStore = defineStore('userAuth', {
       this.isAuthenticated = !!Cookies.get('token') // Update state dynamically
     },
     async refreshToken() {
+      if (!Cookies.get('refreshToken')) return
       try {
         const response = await UserService.refreshUserToken() // Your API endpoint
         this.token = response.data.token
