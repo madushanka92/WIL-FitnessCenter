@@ -43,4 +43,12 @@ export default [
     },
     component: () => lazyLoad('trainers'),
   },
+  {
+    path: 'promotionAdmin',
+    name: 'promotionAdmin',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('promotionAdmin'),
+  },
 ]
