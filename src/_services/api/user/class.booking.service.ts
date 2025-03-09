@@ -15,6 +15,12 @@ const ClassBookingService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async getAllClassForUser() {
+    const url = 'class-booking/my-class'
+
+    return await ApiService.get(url)
+  },
 }
 
 export { ClassBookingService }

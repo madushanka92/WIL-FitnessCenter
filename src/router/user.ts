@@ -37,4 +37,9 @@ export default [
     name: 'checkout',
     component: () => lazyLoad('checkout'),
   },
+  {
+    path: 'my-bookings',
+    name: 'my-bookings',
+    component: () => lazyLoad('my-bookings'),
+  },
 ]
