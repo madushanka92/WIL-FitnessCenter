@@ -34,7 +34,7 @@ export default [
     },
     component: () => lazyLoad('view-testimonials'),
   },
-  
+
   {
     path: 'trainers',
     name: 'trainers',
@@ -42,5 +42,21 @@ export default [
       isAdmin: true,
     },
     component: () => lazyLoad('trainers'),
+  },
+  {
+    path: 'manage-blogs',
+    name: 'manage-blogs',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('manage-blogs'),
+  },
+  {
+    path: '/manage-blogs/create',
+    name: 'manage-blogs-create',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('blog-form'),
   },
 ]
