@@ -42,4 +42,9 @@ export default [
     name: 'my-bookings',
     component: () => lazyLoad('my-bookings'),
   },
+  {
+    path: 'my-profile',
+    name: 'my-profile',
+    component: () => lazyLoad('my-profile'),
+  },
 ]

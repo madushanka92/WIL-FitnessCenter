@@ -74,6 +74,12 @@ const UserService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async getUserById(id: any) {
+    const url = 'user/' + id
+
+    return await ApiService.get(url)
+  },
 }
 
 export { UserService }
