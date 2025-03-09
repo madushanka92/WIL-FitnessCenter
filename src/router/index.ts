@@ -13,6 +13,7 @@ import TrainerRoutes from './trainer'
 import ClassRoutes from './class'
 import { isCurrentUserAdmin } from '@/_services/helpers/helpers'
 import { useUserAuthStore } from '@/stores/auth.module'
+import BlogRoutes from './blog'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,7 @@ const router = createRouter({
         ...AdminRoutes,
         ...TrainerRoutes,
         ...ClassRoutes,
+        ...BlogRoutes
       ],
     },
     {
