@@ -59,4 +59,12 @@ export default [
     },
     component: () => lazyLoad('blog-form'),
   },
+  {
+    path: 'promotionAdmin',
+    name: 'promotionAdmin',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('promotionAdmin'),
+  },
 ]

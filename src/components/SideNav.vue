@@ -14,6 +14,7 @@
         <v-list-item title="User Roles" prepend-icon="mdi-cog" to="/user-roles" />
         <v-list-item title="Class" prepend-icon="mdi-human-capacity-decrease" to="/admin-class" />
         <v-list-item title="Trainers" prepend-icon="mdi-cog" to="/trainers" />
+        <v-list-item title="Promotion" prepend-icon="mdi-cog" to="/promotionAdmin" />
         <v-list-item title="Testimonials" prepend-icon="mdi-message-draw" to="/view-testimonials" />
         <v-list-item title="Manage Blogs" prepend-icon="mdi-message-draw" to="/manage-blogs" />
 
