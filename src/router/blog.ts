@@ -6,6 +6,11 @@ const lazyLoad = (file: any) =>
       path: 'blog-list',
       name: 'blog-list',
       component: () => lazyLoad('blog'),
+    },
+    {
+      path: "blog-post/:id",
+      name: "blog-post-by-id",
+      component: () => lazyLoad("blog-post")
     }
   ];
   

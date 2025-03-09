@@ -3,30 +3,18 @@
     <!-- Search Bar -->
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <v-text-field
-          v-model="search"
-          label="Search by Title or Content"
-          clearable
-          variant="outlined"
-          prepend-inner-icon="mdi-magnify"
-          class="mb-4"
-        ></v-text-field>
+        <v-text-field v-model="search" label="Search by Title or Content" clearable variant="outlined"
+          prepend-inner-icon="mdi-magnify" class="mb-4"></v-text-field>
       </v-col>
     </v-row>
 
     <!-- Blog Posts -->
     <v-row justify="center" align="start">
       <v-col v-for="post in filteredPosts" :key="post._id" cols="12" md="4">
-        <v-card class="post-content">
+        <v-card class="post-content" @click="showPost(post)">
           <!-- Display Image -->
-          <v-img
-            v-if="post.blog_image.length > 0"
-            :src="post.blog_image[0]"
-            alt="Blog Image"
-            height="200px"
-            class="blog-image"
-            contain
-          ></v-img>
+          <v-img v-if="post.blog_image.length > 0" :src="post.blog_image[0]" alt="Blog Image" height="200px"
+            class="blog-image" contain></v-img>
 
           <v-card-title class="mt-3">{{ post.title }}</v-card-title>
           <v-card-subtitle>{{ post.content }}</v-card-subtitle>
@@ -40,11 +28,14 @@
 import { ref, onMounted, computed } from "vue";
 import { BlogService } from "@/_services/api/admin/blog.service";
 import appConfig from "../app-config";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const posts = ref([]);
     const search = ref("");
+
+    const router = useRouter()
 
     onMounted(async () => {
       try {
@@ -77,7 +68,13 @@ export default {
       });
     });
 
-    return { posts, search, filteredPosts };
+    const showPost = (post: any) => {
+      router.push(
+        "blog-post/" + post._id
+      )
+    }
+
+    return { posts, search, filteredPosts, showPost };
   },
 };
 </script>
