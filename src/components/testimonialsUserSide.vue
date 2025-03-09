@@ -19,7 +19,7 @@
             <blockquote>
               <p class="text-h6 font-italic">{{ testimonial.content }}</p>
               <footer class="text-subtitle-1 mt-3">
-                — {{ testimonial.user.first_name }} {{ testimonial.user.last_name }}
+                — {{ testimonial.user?.first_name }} {{ testimonial.user?.last_name }}
               </footer>
             </blockquote>
             <!-- Display Rating as Stars -->
@@ -40,21 +40,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-const testimonials = ref([]);
+const testimonials = ref([])
 
 const fetchTestimonials = async () => {
   try {
-    const response = await axios.get("/testimonials/view-testimonial"); // Adjust the API URL if needed
-    testimonials.value = response.data.testimonials;
+    const response = await axios.get('/testimonials/view-testimonial') // Adjust the API URL if needed
+    testimonials.value = response.data.testimonials
   } catch (error) {
-    console.error("Error fetching testimonials:", error);
+    console.error('Error fetching testimonials:', error)
   }
-};
+}
 
-onMounted(fetchTestimonials);
+onMounted(fetchTestimonials)
 </script>
 
 <style scoped>
