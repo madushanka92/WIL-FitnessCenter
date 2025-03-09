@@ -136,6 +136,7 @@ export default defineComponent({
           fetchBookings()
         })
       } catch (error) {
+        snackbar.handleError(error, 'Class cancel failed !')
       } finally {
         uiStore.setShowOverLay(false)
       }

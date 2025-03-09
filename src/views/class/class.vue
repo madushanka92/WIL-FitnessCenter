@@ -206,6 +206,7 @@ const cancelBooking = async (cls: any) => {
       fetchClasses()
     })
   } catch (error) {
+    snackbar.handleError(error, 'Class cancel failed !')
   } finally {
     uiStore.setShowOverLay(false)
   }
