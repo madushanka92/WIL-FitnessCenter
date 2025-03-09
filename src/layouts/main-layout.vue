@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <HeaderNav />
-    <v-main class="d-flex align-center justify-center fill-height">
-      <v-container class="text-center">
+    <v-main class="align-center justify-center fill-height">
+      <v-container class="text-center main-layout-container">
         <slot></slot>
       </v-container>
     </v-main>
@@ -57,8 +57,19 @@ const confirmationDialog = computed(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss">
 .fill-height {
   min-height: calc(100vh - 128px); /* Adjusts for header/footer height */
+}
+
+.main-layout-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  > div.content {
+    height: 100%;
+  }
 }
 </style>

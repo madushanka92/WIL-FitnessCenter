@@ -13,6 +13,18 @@
       <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>
     </v-overlay>
     <FooterNav />
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="confirmationDialog" max-width="400px">
+      <v-card>
+        <v-card-title class="text-h6">{{ confirmationTitle }}</v-card-title>
+        <v-card-text>{{ confirmationMsg }}</v-card-text>
+        <v-card-actions>
+          <v-btn color="gray" @click="cancelConfirm">No</v-btn>
+          <v-btn color="red" @click="confirmRequest">Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -26,6 +38,26 @@ import { computed } from 'vue'
 const uiStore = useUiStore()
 const overlay = computed(() => {
   return uiStore.getShowOverLay
+})
+
+const confirmationTitle = computed(() => {
+  return uiStore.getConfirmationTitle
+})
+
+const confirmationMsg = computed(() => {
+  return uiStore.getConfirmationMsg
+})
+
+const cancelConfirm = () => {
+  uiStore.cancelConfirm()
+}
+
+const confirmRequest = () => {
+  uiStore.confirmRequest()
+}
+
+const confirmationDialog = computed(() => {
+  return uiStore.getIsConfirmVisible
 })
 </script>
 

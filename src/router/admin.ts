@@ -67,4 +67,12 @@ export default [
     },
     component: () => lazyLoad('promotionAdmin'),
   },
+  {
+    path: '/manage-blogs/edit/:id',
+    name: 'manage-blogs-edit',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('blog-form'),
+  },
 ]

@@ -40,11 +40,17 @@ export default [
   {
     path: 'my-bookings',
     name: 'my-bookings',
+    meta: {
+      auth: true,
+    },
     component: () => lazyLoad('my-bookings'),
   },
   {
     path: 'my-profile',
     name: 'my-profile',
+    meta: {
+      auth: true,
+    },
     component: () => lazyLoad('my-profile'),
   },
 ]

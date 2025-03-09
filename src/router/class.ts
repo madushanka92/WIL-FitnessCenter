@@ -5,6 +5,9 @@ export default [
   {
     path: 'class-list',
     name: 'class-list',
+    meta: {
+      auth: true,
+    },
     component: () => lazyLoad('class'),
   },
 ]

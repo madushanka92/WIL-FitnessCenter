@@ -36,7 +36,7 @@ const router = createRouter({
         ...AdminRoutes,
         ...TrainerRoutes,
         ...ClassRoutes,
-        ...BlogRoutes
+        ...BlogRoutes,
       ],
     },
     {
@@ -72,7 +72,7 @@ router.beforeEach((to, from, next) => {
     to.meta.layout = isAdmin ? AdminLayout : MainLayout
   }
 
-  if (to.meta.isAdmin && !isAdmin) {
+  if ((to.meta.auth && !authStore.isAuthenticated) || (to.meta.isAdmin && !isAdmin)) {
     next({ name: 'unauthorized' })
   } else next()
 })

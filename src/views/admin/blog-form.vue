@@ -1,24 +1,62 @@
 <template>
   <v-container class="blog-form">
-    <v-form @submit.prevent="handleSubmit">
-      <v-text-field v-model="form.title" label="Title" required />
+    <v-card class="pa-6 rounded-xl elevation-4">
+      <h2 class="text-h5 font-weight-bold mb-4">
+        {{ isEditing ? 'Edit Blog Post' : 'Create Blog Post' }}
+      </h2>
 
-      <!-- Use Quill editor component with two-way binding for content -->
-      <QuillEditor
-        v-model:content="form.content"
-        theme="snow"
-        content="html"
-        contentType="html"
-        :toolbar="fullToolbarOptions"
-        :modules="quillModules"
-      />
+      <v-form @submit.prevent="handleSubmit" class="d-flex flex-column gap-4">
+        <v-text-field
+          v-model="form.title"
+          label="Blog Title"
+          prepend-inner-icon="mdi-pencil"
+          outlined
+          dense
+          required
+        />
 
-      <v-text-field v-model="form.author" label="Author" required />
+        <QuillEditor
+          v-model:content="form.content"
+          theme="snow"
+          content="html"
+          contentType="html"
+          :toolbar="fullToolbarOptions"
+          :modules="quillModules"
+        />
 
-      <v-btn color="primary" type="submit">
-        {{ isEditing ? 'Update Blog' : 'Create Blog' }}
-      </v-btn>
-    </v-form>
+        <v-text-field
+          v-model="form.author"
+          label="Author"
+          prepend-inner-icon="mdi-account"
+          outlined
+          dense
+          required
+        />
+
+        <!-- Thumbnail Image Upload -->
+        <v-file-input
+          label="Upload Thumbnail"
+          accept="image/*"
+          @change="handleFileChange"
+          outlined
+          dense
+          prepend-icon="mdi-image"
+        />
+
+        <!-- Thumbnail Preview -->
+        <v-img
+          v-if="form.thumbnail || previewUrl"
+          :src="previewUrl || appConfig.VUE_APP_API_BASE_URL + form.thumbnail"
+          class="mt-4 rounded-lg elevation-2"
+          max-height="200"
+          contain
+        />
+
+        <v-btn color="primary" type="submit" block class="mt-4 py-3 rounded-lg text-uppercase">
+          {{ isEditing ? 'Update Blog' : 'Create Blog' }}
+        </v-btn>
+      </v-form>
+    </v-card>
   </v-container>
 </template>
 
@@ -29,55 +67,97 @@ import { QuillEditor } from '@vueup/vue-quill'
 import ImageUploader from 'quill-image-uploader'
 import axios from 'axios'
 import appConfig from '../app-config'
+import { BlogService } from '@/_services/api/admin/blog.service'
+import { useUiStore } from '@/stores/ui.module'
+import { useSnackbarStore } from '@/stores/useSnackbarStore'
 
 const route = useRoute()
 const router = useRouter()
 const uploadedImages = ref<string[]>([])
+const uiStore = useUiStore()
+const snackbar = useSnackbarStore()
 
 const isEditing = ref(false)
 const form = ref({
   title: '',
-  content: '', // Content will be bound here
+  content: '',
   author: '',
+  thumbnail: '', // This will hold the thumbnail image URL
 })
+const selectedFile = ref<File | null>(null)
+const previewUrl = ref<string | null>(null)
 
-onMounted(() => {
+onMounted(async () => {
   if (route.params.id) {
-    isEditing.value = true
-    // Fetch existing blog data and populate the form (if editing)
-    // example: form.value = blogData from the store
+    await fetchBlogPost()
   }
 })
 
+const fetchBlogPost = async () => {
+  try {
+    uiStore.setShowOverLay(true)
+    isEditing.value = true
+    const blog = await BlogService.getPostById(route.params.id)
+
+    if (blog) {
+      form.value = { ...blog.data }
+      if (blog.data.blog_image.length > 0) previewUrl.value = blog.data.blog_image[0]
+    }
+
+    uiStore.setShowOverLay(false)
+  } catch (error) {
+    uiStore.setShowOverLay(false)
+    snackbar.handleError(error, 'Failed to fetch blog')
+  }
+}
+
+const handleFileChange = (event: any) => {
+  const file = event.target.files[0]
+  if (file) {
+    selectedFile.value = file
+
+    // Generate a local preview URL for the image
+    previewUrl.value = URL.createObjectURL(file)
+  }
+}
+
 const handleSubmit = async () => {
-  // Get the current image URLs in the content
+  // Handle uploaded images inside the content first
   const contentImages = Array.from(
     new DOMParser().parseFromString(form.value.content, 'text/html').querySelectorAll('img'),
   ).map((img: HTMLImageElement) => img.src)
 
-  // Compare with uploaded images array
   const imagesToRemove = uploadedImages.value.filter(
-    (imageUrl) => !contentImages.includes(imageUrl),
+    (imageUrl: any) => !contentImages.includes(imageUrl),
   )
 
-  // Remove images not in the content anymore
   for (const imageUrl of imagesToRemove) {
-    await removeImage(imageUrl) // Call the API to remove the image
+    await removeImage(imageUrl)
   }
 
-  // Now save the blog
-  const blogData = {
-    title: form.value.title,
-    content: form.value.content,
-    author: form.value.author,
+  // Now prepare form data (with file)
+  const formData = new FormData()
+  formData.append('title', form.value.title)
+  formData.append('content', form.value.content)
+  formData.append('author', form.value.author)
+
+  if (selectedFile.value) {
+    formData.append('blog_images', selectedFile.value)
   }
 
-  if (isEditing.value) {
-    console.log('Updating blog:', blogData)
-    // Call API to update blog
-  } else {
-    console.log('Creating new blog:', blogData)
-    // Call API to create new blog
+  // Call API
+  uiStore.setShowOverLay(true)
+  try {
+    if (isEditing.value) {
+      await BlogService.updatePost(route.params.id, formData)
+    } else {
+      await BlogService.createPost(formData)
+    }
+    router.push('/manage-blogs')
+  } catch (error) {
+    snackbar.handleError(error, 'Failed to save blog')
+  } finally {
+    uiStore.setShowOverLay(false)
   }
 }
 
@@ -86,8 +166,7 @@ const removeImage = async (imageUrl: string) => {
     await axios.delete('/delete-image', {
       data: { url: imageUrl.replace(appConfig.VUE_APP_API_BASE_URL, '') },
     })
-    // Optionally, remove the image URL from the array
-    uploadedImages.value = uploadedImages.value.filter((url: any) => url !== imageUrl)
+    uploadedImages.value = uploadedImages.value.filter((url) => url !== imageUrl)
   } catch (error) {
     console.error('Error removing image:', error)
   }
@@ -99,8 +178,8 @@ const fullToolbarOptions = [
   ['bold', 'italic', 'underline'],
   ['link'],
   [{ align: [] }],
-  ['image'], // Image button in the toolbar
-  [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+  ['image'],
+  [{ color: [] }, { background: [] }],
 ]
 
 const quillModules = {
@@ -116,7 +195,7 @@ const quillModules = {
           .post('/upload-image', formData)
           .then((res) => {
             const uploadedUrl = res.data.url
-            uploadedImages.value.push(uploadedUrl) // Save the uploaded image URL
+            uploadedImages.value.push(uploadedUrl)
             resolve(uploadedUrl)
           })
           .catch((err) => {
@@ -130,14 +209,28 @@ const quillModules = {
 </script>
 
 <style lang="scss">
-.quill-editor {
-  min-height: 200px;
-  border: 1px solid #ccc;
-}
+// .quill-editor {
+//   min-height: 200px;
+//   border: 1px solid #ccc;
+// }
 
 .blog-form {
   div.ql-container.ql-snow {
-    min-height: 400px;
+    min-height: 200px;
   }
+}
+
+.blog-form {
+  //   max-width: 700px;
+  margin: 0 auto;
+}
+
+.v-card {
+  background-color: #ffffff;
+}
+
+.v-btn {
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 </style>
