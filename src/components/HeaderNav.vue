@@ -24,6 +24,7 @@
       </template>
       <v-list>
         <v-list-item to="/profile">Profile</v-list-item>
+        <v-list-item to="/my-bookings">My Bookings</v-list-item>
         <v-list-item @click="logout">Logout</v-list-item>
       </v-list>
     </v-menu>

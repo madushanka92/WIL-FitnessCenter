@@ -1,19 +1,32 @@
 <template>
   <div class="d-flex flex-column align-start" style="min-height: 100vh; padding: 16px">
-    <v-text-field
-      v-model="searchQuery"
-      label="Search Classes"
-      class="mb-4 w-100 search-input"
-      density="comfortable"
-      outlined
-      @input="debouncedFetchClasses"
-    />
+    <div class="search-fields">
+      <v-text-field
+        v-model="searchQuery"
+        label="Search Classes"
+        class="mb-4 w-100 search-input"
+        density="comfortable"
+        outlined
+        @update:modelValue="debouncedFetchClasses"
+        clearable
+      />
+
+      <v-text-field
+        v-model="filterDate"
+        label="Start Time"
+        type="date"
+        @update:modelValue="handleDateChange"
+        class="mb-4 w-100 search-input date-input"
+        clearable
+      />
+    </div>
 
     <v-data-table
       :headers="headers"
       :items="filteredClasses"
       class="elevation-1 w-100"
       style="min-height: 50%"
+      :sort-by="[{ key: 'start_time', order: 'asc' }]"
     >
       <template v-slot:item.start_time="{ item }">
         {{ formatDate(item.start_time) }}
@@ -90,6 +103,7 @@ import { useUiStore } from '@/stores/ui.module'
 import { nextTick } from 'process'
 
 const searchQuery = ref('')
+const filterDate = ref<string | null>(null)
 interface Class {
   class_name: string
   trainer_full_name: string
@@ -120,8 +134,12 @@ const headers = ref([
 ])
 
 const fetchClasses = async () => {
+  uiStore.setShowOverLay(true)
   try {
-    const { data } = await ClassService.getAllClass({ search: searchQuery.value })
+    const { data } = await ClassService.getAllClass({
+      search: searchQuery.value,
+      start_time: filterDate.value,
+    })
     filteredClasses.value = data.map((cls: any) => ({
       ...cls,
       trainer_full_name: cls.trainer?.user
@@ -130,6 +148,8 @@ const fetchClasses = async () => {
     }))
   } catch (error) {
     snackbar.handleError(error, 'Failed to fetch classes')
+  } finally {
+    uiStore.setShowOverLay(false)
   }
 }
 
@@ -171,6 +191,10 @@ const bookClass = async () => {
   }
 }
 
+const handleDateChange = () => {
+  fetchClasses()
+}
+
 const cancelBooking = async (cls: any) => {
   uiStore.setShowOverLay(true)
   try {
@@ -189,10 +213,26 @@ const cancelBooking = async (cls: any) => {
 
 onMounted(fetchClasses)
 </script>
-
 <style lang="scss">
-.search-input {
-  height: 50px !important;
-  flex: unset !important;
+.search-fields {
+  width: 100%;
+  display: flex;
+  .search-input {
+    height: 50px !important;
+    flex: unset !important;
+
+    .v-input__control {
+      div.v-field {
+        flex: unset !important;
+        width: 220px;
+      }
+    }
+  }
+
+  .date-input {
+    > div.v-input__control {
+      flex-direction: row-reverse;
+    }
+  }
 }
 </style>

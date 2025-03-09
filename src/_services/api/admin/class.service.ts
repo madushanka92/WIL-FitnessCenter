@@ -6,9 +6,17 @@ ApiService.init(appConfig.VUE_APP_ROOT_API)
 const ClassService = {
   async getAllClass(filter: any) {
     let url = 'class'
+    let queryParams = []
+
     if (filter) {
-      if (filter.search) url += '?search=' + filter.search
+      if (filter.search) queryParams.push('search=' + filter.search)
+      if (filter.start_time) queryParams.push('start_time=' + filter.start_time)
     }
+
+    if (queryParams.length) {
+      url += '?' + queryParams.join('&')
+    }
+
     return await ApiService.get(url)
   },
 
