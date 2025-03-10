@@ -34,7 +34,7 @@ export default [
     },
     component: () => lazyLoad('view-testimonials'),
   },
-  
+
   {
     path: 'trainers',
     name: 'trainers',
@@ -44,11 +44,35 @@ export default [
     component: () => lazyLoad('trainers'),
   },
   {
+    path: 'manage-blogs',
+    name: 'manage-blogs',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('manage-blogs'),
+  },
+  {
+    path: '/manage-blogs/create',
+    name: 'manage-blogs-create',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('blog-form'),
+  },
+  {
     path: 'promotionAdmin',
     name: 'promotionAdmin',
     meta: {
       isAdmin: true,
     },
     component: () => lazyLoad('promotionAdmin'),
+  },
+  {
+    path: '/manage-blogs/edit/:id',
+    name: 'manage-blogs-edit',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('blog-form'),
   },
 ]

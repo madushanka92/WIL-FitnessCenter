@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="trainer-container">
     <v-row justify="center">
       <v-col cols="12" md="10">
         <v-text-field
@@ -104,5 +104,11 @@ export default {
 .v-text-field {
   max-width: 400px;
   margin: 0 auto;
+}
+
+.trainer-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

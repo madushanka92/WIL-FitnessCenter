@@ -1,86 +1,137 @@
- <template>
-    <v-container v-if="post">
-      <v-row justify="center">
-        <!-- Title and Content -->
-        <v-col cols="12" md="8">
-          <v-card class="blog-post-card">
-            <v-img
-              v-if="post.blog_image && post.blog_image.length > 0"
-              :src="post.blog_image[0]" 
-              alt="Blog Image"
-              class="blog-image"
-              height="300px"
-              contain
-            ></v-img>
-  
-            <!-- Title -->
-            <v-card-title class="mt-3">
-              <h1>{{ post.title }}</h1>
-            </v-card-title>
-            
-            <!-- Content -->
-            <v-card-subtitle>
-              <p class="blog-content">{{ post.content }}</p>
-            </v-card-subtitle>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  
-    <!-- Loading indicator -->
-    <div v-else>
-      <p>Loading...</p>
-    </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
-  import { useRoute } from 'vue-router';
-  import { BlogService } from '@/_services/api/admin/blog.service';
-  
-  const route = useRoute();
-  const post_id = route.params.id as string; // Get the post ID from route params
-  const post = ref<any>(null); // Initialize as null
-  
-  onMounted(async () => {
-    try {
-      // Fetch the blog post by ID
-      const response = await BlogService.getPostById(post_id);
-      post.value = response.data; // Store the post data in the post variable
-    } catch (error) {
-      console.error('Error fetching blog post:', error);
-    }
-  });
-  </script>
-  
-  <style scoped>
-  .blog-post-card {
-    padding: 20px;
-    border-radius: 10px;
-    background: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
+<template>
+  <v-container v-if="post" class="blog-post">
+    <!-- Hero Section -->
+    <v-card class="hero-card">
+      <v-img
+        v-if="post.blog_image && post.blog_image.length > 0"
+        :src="post.blog_image[0]"
+        alt="Blog Image"
+        class="hero-image"
+        cover
+      >
+        <div class="overlay d-flex flex-column justify-center align-center">
+          <h1 class="text-h3 font-weight-bold text-white text-center">
+            {{ post.title }}
+          </h1>
+          <p class="text-white text-subtitle-1 mt-2">
+            By {{ post.author }} | {{ formatDate(post.created_at) }}
+          </p>
+        </div>
+      </v-img>
+    </v-card>
+
+    <!-- Content Section -->
+    <v-row justify="center" class="mt-6">
+      <v-col cols="12" md="12">
+        <v-card class="content-card pa-6 rounded-lg elevation-2">
+          <div v-html="post.content" class="blog-content"></div>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+
+  <!-- Skeleton Loader -->
+  <v-container v-else>
+    <v-row justify="center">
+      <v-col cols="12" md="8">
+        <v-skeleton-loader
+          class="skeleton-loader"
+          :loading="!post"
+          type="article, image, heading"
+        />
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { BlogService } from '@/_services/api/admin/blog.service'
+
+const route = useRoute()
+const post_id = route.params.id as string
+const post = ref<any>(null)
+
+onMounted(async () => {
+  try {
+    const response = await BlogService.getPostById(post_id)
+    post.value = response.data
+  } catch (error) {
+    console.error('Error fetching blog post:', error)
   }
-  
-  .blog-image {
-    border-radius: 10px;
+})
+
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   }
-  
-  .v-card-title h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
+  return new Date(dateString).toLocaleDateString(undefined, options)
+}
+</script>
+
+<style scoped>
+/* Hero Section */
+.hero-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 400px;
+}
+
+.hero-image {
+  height: 100%;
+  filter: brightness(0.7);
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+}
+
+.overlay h1 {
+  text-shadow: 1px 1px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Content Card */
+.content-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.blog-content {
+  font-size: 1.1rem;
+  color: #444;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.blog-content img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+/* Loading Skeleton */
+.skeleton-loader {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .v-card-subtitle .blog-content {
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.8; /* Increased line height for better readability */
-    margin-top: 10px;
-    text-align: justify; /* Ensures the content is aligned */
-    overflow-wrap: break-word; /* Ensures long words or links break properly */
-    white-space: pre-wrap; /* Handles new lines from the content */
-    word-wrap: break-word; /* Handles word overflow */
-    max-width: 100%; /* Ensures content does not exceed the width of the container */
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  </style>
+}
+</style>

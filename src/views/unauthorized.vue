@@ -1,7 +1,7 @@
 <template>
   <v-container class="unauthorized">
     <v-row justify="center">
-      <v-col cols="12" md="6" class="text-center">
+      <v-col cols="12" md="12" class="text-center">
         <v-icon size="100" color="red">mdi-lock-alert</v-icon>
         <h1 class="text-h4 mt-4">Unauthorized Access</h1>
         <p class="text-body-1 mt-2">You do not have permission to view this page.</p>
@@ -23,6 +23,8 @@ const goHome = () => {
 
 <style scoped>
 .unauthorized {
+  min-width: 600px;
+  height: 100%;
   /* min-height: 100vh; */
   display: flex;
   align-items: center;

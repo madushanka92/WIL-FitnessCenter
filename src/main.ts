@@ -6,6 +6,7 @@ import { createVuetify } from 'vuetify'
 import 'vuetify/styles' // Import Vuetify styles
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@mdi/font/css/materialdesignicons.css' // Ensure MDI icons are imported
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 import App from './App.vue'
 import router from './router'

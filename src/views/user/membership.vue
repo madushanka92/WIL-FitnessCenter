@@ -269,6 +269,7 @@ const getTotalPayment = (amount: any, discount: any) => {
   }
 }
 .membership-container {
+  height: 100%;
   min-height: 50vh;
   padding: 32px;
   display: flex;
