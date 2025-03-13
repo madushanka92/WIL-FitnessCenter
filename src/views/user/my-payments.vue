@@ -1,5 +1,11 @@
 <template>
   <v-container>
+    <!-- Membership Banner -->
+    <v-alert v-if="membership" type="info" class="mb-4 text-center" prominent>
+      <strong>Membership:</strong> {{ membership.membership_name }} | <strong>Expires on:</strong>
+      {{ formatDate(membership.expires_at) }}
+    </v-alert>
+
     <h2 class="text-center my-4">My Payments</h2>
     <v-data-table
       :items="payments"
@@ -25,6 +31,7 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { VDataTable } from 'vuetify/components/VDataTable'
 import { PaymentService } from '@/_services/api/user/payment.service'
+import { MembershipService } from '@/_services/api/user/membership.service'
 
 // Payment type
 interface Payment {
@@ -37,8 +44,14 @@ interface Payment {
   created_at: string
 }
 
+interface Membership {
+  membership_name: string
+  expires_at: string
+}
+
 // State
 const payments = ref<Payment[]>([])
+const membership = ref<Membership | null>(null)
 
 // Fetch payments
 const fetchPayments = async () => {
@@ -48,6 +61,13 @@ const fetchPayments = async () => {
   } catch (error) {
     console.error('Failed to fetch payments', error)
   }
+}
+
+const fetchMembership = async () => {
+  try {
+    const res = await MembershipService.getMemberShipInfo()
+    membership.value = res.data
+  } catch (error) {}
 }
 
 // Generate Invoice PDF
@@ -109,7 +129,19 @@ const downloadInvoice = (payment: Payment) => {
 }
 
 // Fetch data when the component mounts
-onMounted(fetchPayments)
+onMounted(() => {
+  fetchPayments()
+  fetchMembership()
+})
+
+// Format date
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 </script>
 
 <style lang="scss">
