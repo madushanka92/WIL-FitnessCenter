@@ -53,4 +53,12 @@ export default [
     },
     component: () => lazyLoad('my-profile'),
   },
+  {
+    path: 'my-payments',
+    name: 'my-payments',
+    meta: {
+      auth: true,
+    },
+    component: () => lazyLoad('my-payments'),
+  },
 ]

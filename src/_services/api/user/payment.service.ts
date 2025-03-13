@@ -16,6 +16,11 @@ const PaymentService = {
 
     return await ApiService.post(url, payload)
   },
+
+  async getPaymentsForUser() {
+    const url = 'payment/for-user'
+    return await ApiService.get(url)
+  },
 }
 
 export { PaymentService }
