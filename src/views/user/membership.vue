@@ -74,6 +74,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <DisplayDiscounts />
   </div>
 </template>
 
@@ -89,6 +91,7 @@ import { nextTick } from 'process'
 import { UserService } from '@/_services/api/user/user.service'
 import { getUserID, getUserMembership } from '@/_services/helpers/helpers'
 import { useUiStore } from '@/stores/ui.module'
+import DisplayDiscounts from "../../components/DisplayDiscounts.vue";
 
 const filteredMemberships = ref([] as any)
 const snackbar = useSnackbarStore()
@@ -275,6 +278,7 @@ const getTotalPayment = (amount: any, discount: any) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 
   .membership-card {
     height: 100%;
