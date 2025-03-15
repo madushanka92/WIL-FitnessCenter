@@ -32,3 +32,7 @@ export function decodeUserId(token: string) {
 export function isUseraMember(token: string) {
   return decodeToken(token)?.membership_id
 }
+
+export function isUserTrainer(token: string): boolean {
+  return decodeToken(token)?.role === 'trainer'
+}

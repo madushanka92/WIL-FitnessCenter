@@ -2,7 +2,8 @@
   <v-container>
     <!-- Membership Banner -->
     <v-alert v-if="membership" type="info" class="mb-4 text-center" prominent>
-      <strong>Membership:</strong> {{ membership.membership_name }} | <strong>Expires on:</strong>
+      <strong>Membership:</strong> {{ capitalizeWords(membership.membership_name) }} |
+      <strong>Expires on:</strong>
       {{ formatDate(membership.expires_at) }}
     </v-alert>
 
@@ -11,13 +12,17 @@
       :items="payments"
       :headers="[
         { title: 'Transaction ID', key: 'transaction_id' },
-        { title: 'Amount', key: 'amount.$numberDecimal' },
+        { title: 'Amount', key: 'amount' },
         { title: 'Payment Method', key: 'payment_method' },
         { title: 'Status', key: 'payment_status' },
         { title: 'Date', key: 'created_at' },
         { title: 'Invoice', key: 'actions', sortable: false },
       ]"
     >
+      <!-- Format Amount as Currency -->
+      <template v-slot:item.amount="{ item }">
+        {{ formatCurrency(item.amount.$numberDecimal) }}
+      </template>
       <template v-slot:item.actions="{ item }">
         <v-btn color="primary" @click="downloadInvoice(item)">Download PDF</v-btn>
       </template>
@@ -52,6 +57,14 @@ interface Membership {
 // State
 const payments = ref<Payment[]>([])
 const membership = ref<Membership | null>(null)
+
+const capitalizeWords = (str: string) => {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'CAD' }).format(value)
+}
 
 // Fetch payments
 const fetchPayments = async () => {

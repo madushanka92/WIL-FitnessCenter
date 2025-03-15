@@ -21,6 +21,7 @@
           <v-btn
             :color="selectedEvent.status === 'canceled' ? 'green' : 'red'"
             @click="confirmCancelBooking"
+            v-if="!isUserTrainer"
           >
             {{ selectedEvent.status === 'canceled' ? 'Re-Book' : 'Cancel Booking' }}
           </v-btn>
@@ -32,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, nextTick } from 'vue'
+import { defineComponent, ref, onMounted, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import FullCalendar from '@fullcalendar/vue3'
@@ -42,6 +43,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import { ClassBookingService } from '@/_services/api/user/class.booking.service'
 import { useUiStore } from '@/stores/ui.module'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
+import { isCurrentUserTrainer } from '@/_services/helpers/helpers'
 
 export default defineComponent({
   name: 'MyBookings',
@@ -55,6 +57,10 @@ export default defineComponent({
     const dialog = ref(false)
     const uiStore = useUiStore()
     const snackbar = useSnackbarStore()
+
+    const isUserTrainer = computed(() => {
+      return isCurrentUserTrainer()
+    })
 
     const fetchBookings = async () => {
       try {
@@ -76,6 +82,7 @@ export default defineComponent({
         }))
       } catch (error) {
         console.error('Error fetching bookings:', error)
+        snackbar.handleError(error, 'Class booking failed !')
       }
     }
 
@@ -165,6 +172,7 @@ export default defineComponent({
       calendarOptions,
       cancelBooking,
       confirmCancelBooking,
+      isUserTrainer,
     }
   },
 })
