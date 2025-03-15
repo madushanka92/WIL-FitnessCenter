@@ -1,7 +1,25 @@
 <template>
   <div>
+    <!-- Tabs for All Users / Active Members -->
+    <v-tabs v-model="selectedTab">
+      <v-tab value="all">All Users</v-tab>
+      <v-tab value="active">Active Members</v-tab>
+    </v-tabs>
+
+    <v-window v-model="selectedTab">
+      <!-- All Users Tab -->
+      <v-window-item value="all">
+        <UserTable :users="filteredUsers" @delete="confirmDelete" @reset="openDialog" />
+      </v-window-item>
+
+      <!-- Active Members Tab -->
+      <v-window-item value="active">
+        <UserTable :users="activeMembers" @delete="confirmDelete" @reset="openDialog" />
+      </v-window-item>
+    </v-window>
+
     <!-- Search Bar & Role Filter -->
-    <div class="d-flex mb-4">
+    <!-- <div class="d-flex mb-4">
       <v-text-field v-model="searchQuery" label="Search Users" class="mr-4" />
       <v-select
         v-model="selectedRole"
@@ -9,15 +27,15 @@
         label="Filter by Role"
         class="role-filter"
       />
-    </div>
+    </div> -->
 
     <!-- Users Table -->
-    <v-data-table :headers="headers" :items="filteredUsers">
+    <!-- <v-data-table :headers="headers" :items="filteredUsers">
       <template v-slot:item.actions="{ item }">
         <v-icon @click="openDialog(item)" class="mr-2">mdi-lock-reset</v-icon>
         <v-icon @click="confirmDelete(item)" color="red">mdi-delete</v-icon>
       </template>
-    </v-data-table>
+    </v-data-table> -->
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="deleteDialog" max-width="400px">
@@ -62,6 +80,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
+import UserTable from '../../components/admin/UserTable.vue'
 
 const searchQuery = ref('')
 const selectedRole = ref('All') // Default to show all users
@@ -73,6 +92,7 @@ const userToEdit = ref(null)
 const newPassword = ref('')
 const confirmPassword = ref('')
 const snackbar = useSnackbarStore()
+const selectedTab = ref('all') // Default to "All Users"
 
 const roleOptions = ['All', 'Member', 'Trainer'] // Dropdown options
 
@@ -106,6 +126,10 @@ const filteredUsers = computed(() => {
 
     return matchesSearch && matchesRole
   })
+})
+
+const activeMembers = computed(() => {
+  return users.value.filter((user) => user.membership_id !== null)
 })
 
 async function fetchUsers() {

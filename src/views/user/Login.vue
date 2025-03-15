@@ -63,6 +63,17 @@
         </v-card-text>
 
         <v-alert :text="alertText" :type="alertType" closable v-if="alertText"></v-alert>
+
+        <!-- Resend Verification Email Button -->
+        <v-btn
+          v-if="!isVerified"
+          color="secondary"
+          block
+          class="mt-2"
+          @click="resendVerificationEmail"
+        >
+          Resend Verification Email
+        </v-btn>
       </v-form>
     </v-card>
   </v-container>
@@ -76,6 +87,7 @@ import { useUserAuthStore } from '@/stores/auth.module'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
 import { useRouter } from 'vue-router'
 import { getUserMembership } from '@/_services/helpers/helpers'
+import { useUiStore } from '@/stores/ui.module'
 
 const email = ref('')
 const password = ref('')
@@ -89,6 +101,8 @@ const router = useRouter()
 
 const userAuth = useUserAuthStore()
 const snackbar = useSnackbarStore()
+const isVerified = ref(true) // Assume true by default
+const uiStore = useUiStore()
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
@@ -146,8 +160,63 @@ const userLogIn = async () => {
       if (err && err.data?.message) {
         alertType.value = 'error'
         alertText.value = err.data?.message
+
+        if (err.data?.isVerified === false) {
+          if (err.data?.isVerified === false) {
+            isVerified.value = false
+          }
+        }
       }
     })
+}
+
+const resendVerificationEmail = async () => {
+  // try {
+  //   const verificationToken = await UserService.getUserVerificationToken({ email: email.value })
+  // } catch (err: any) {
+  //   if (err && err.data?.message) {
+  //     alertType.value = 'error'
+  //     alertText.value = err.data?.message
+  //   }
+  // }
+
+  uiStore.setShowOverLay(true)
+  await UserService.getUserVerificationToken(email.value)
+    .then(async (res: any) => {
+      console.log('Res ', res)
+
+      const token = res.data.token
+      if (token) {
+        await UserService.resetEmailVerification(token)
+          .then(() => {
+            uiStore.setShowOverLay(false)
+            snackbar.notify('Verification email sent!', 'success')
+            isVerified.value = true
+          })
+          .catch((err: any) => {
+            uiStore.setShowOverLay(false)
+            if (err?.data?.message) {
+              snackbar.notify(err?.data?.message, 'error')
+            } else snackbar.notify('Failed to send verification email.', 'error')
+          })
+      }
+    })
+    .catch((err: any) => {
+      uiStore.setShowOverLay(false)
+      if (err && err.data?.message) {
+        alertType.value = 'error'
+        alertText.value = err.data?.message
+      }
+    })
+
+  // .then(() => {
+  //   alertType.value = 'success'
+  //   alertText.value = 'Verification email resent successfully!'
+  // })
+  // .catch(() => {
+  //   alertType.value = 'error'
+  //   alertText.value = 'Failed to resend verification email. Please try again later.'
+  // })
 }
 
 onMounted(() => {

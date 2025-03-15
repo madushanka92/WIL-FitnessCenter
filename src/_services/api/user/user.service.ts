@@ -80,6 +80,12 @@ const UserService = {
 
     return await ApiService.get(url)
   },
+
+  async getUserVerificationToken(email: any) {
+    const url = 'user/verification-token/' + email
+
+    return await ApiService.get(url)
+  },
 }
 
 export { UserService }

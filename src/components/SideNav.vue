@@ -9,14 +9,22 @@
         <v-divider />
         <v-list-item title="Dashboard" prepend-icon="mdi-view-dashboard" to="/" />
         <v-list-item title="Profile" prepend-icon="mdi-account" to="/profile" />
-        <v-list-item title="Settings" prepend-icon="mdi-cog" to="/settings" />
+        <!-- <v-list-item title="Settings" prepend-icon="mdi-cog" to="/settings" /> -->
         <v-list-item title="View Users" prepend-icon="mdi-account-group" to="/view-users" />
-        <v-list-item title="User Roles" prepend-icon="mdi-cog" to="/user-roles" />
+        <v-list-item
+          title="User Roles"
+          prepend-icon="mdi-account-multiple-outline"
+          to="/user-roles"
+        />
         <v-list-item title="Class" prepend-icon="mdi-human-capacity-decrease" to="/admin-class" />
-        <v-list-item title="Trainers" prepend-icon="mdi-cog" to="/trainers" />
-        <v-list-item title="Promotion" prepend-icon="mdi-cog" to="/promotionAdmin" />
-        <v-list-item title="Testimonials" prepend-icon="mdi-message-draw" to="/view-testimonials" />
-        <v-list-item title="Manage Blogs" prepend-icon="mdi-message-draw" to="/manage-blogs" />
+        <v-list-item title="Trainers" prepend-icon="mdi-weight-lifter" to="/trainers" />
+        <v-list-item title="Promotion" prepend-icon="mdi-sale" to="/promotionAdmin" />
+        <v-list-item
+          title="Testimonials"
+          prepend-icon="mdi-account-voice"
+          to="/view-testimonials"
+        />
+        <v-list-item title="Manage Blogs" prepend-icon="mdi-post-outline" to="/manage-blogs" />
 
         <v-divider />
         <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout" />
