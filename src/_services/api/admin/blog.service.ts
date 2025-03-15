@@ -16,6 +16,17 @@ const BlogService = {
     return await ApiService.get(url);
   },
 
+
+
+  // // Fetch related blog posts based on post ID
+  async getRelatedPosts(id: any) {
+    const url = `blogPost/related/${id}`;
+    return await ApiService.get(url);
+  },
+
+
+
+
   // Update a blog post
   async updatePost(id: any, payload: any) {
     const url = 'blogPost';

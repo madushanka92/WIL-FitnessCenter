@@ -2,13 +2,8 @@
   <v-container v-if="post" class="blog-post">
     <!-- Hero Section -->
     <v-card class="hero-card">
-      <v-img
-        v-if="post.blog_image && post.blog_image.length > 0"
-        :src="post.blog_image[0]"
-        alt="Blog Image"
-        class="hero-image"
-        cover
-      >
+      <v-img v-if="post.blog_image && post.blog_image.length > 0" :src="post.blog_image[0]" alt="Blog Image"
+        class="hero-image" cover>
         <div class="overlay d-flex flex-column justify-center align-center">
           <h1 class="text-h3 font-weight-bold text-white text-center">
             {{ post.title }}
@@ -28,26 +23,29 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Related Post  -->
+    <RelatedPosts :post_id="post_id"/>
   </v-container>
+
 
   <!-- Skeleton Loader -->
   <v-container v-else>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <v-skeleton-loader
-          class="skeleton-loader"
-          :loading="!post"
-          type="article, image, heading"
-        />
+        <v-skeleton-loader class="skeleton-loader" :loading="!post" type="article, image, heading" />
       </v-col>
     </v-row>
   </v-container>
+
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { BlogService } from '@/_services/api/admin/blog.service'
+
+import RelatedPosts from "../../components/relatedPosts.vue"
 
 const route = useRoute()
 const post_id = route.params.id as string
@@ -71,6 +69,9 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 </script>
+
+
+
 
 <style scoped>
 /* Hero Section */
@@ -129,6 +130,7 @@ const formatDate = (dateString: string) => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
