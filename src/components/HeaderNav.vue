@@ -5,11 +5,11 @@
 
     <!-- Navigation Links -->
     <v-spacer></v-spacer>
-    <v-btn text to="/home">Home</v-btn>
-    <v-btn v-if="isAuthenticated" text to="/class-list">Classes</v-btn>
-    <v-btn text to="/trainers-list">Trainers</v-btn>
-    <v-btn text to="/membership-list">Membership</v-btn>
-    <v-btn text to="/blog-list">Blog</v-btn>
+    <v-btn text to="/home" v-if="!isAdmin">Home</v-btn>
+    <v-btn text to="/class-list" v-if="!isAdmin && isAuthenticated">Classes</v-btn>
+    <v-btn text to="/trainers-list" v-if="!isAdmin">Trainers</v-btn>
+    <v-btn text to="/membership-list" v-if="!isAdmin">Membership</v-btn>
+    <v-btn text to="/blog-list" v-if="!isAdmin">Blog</v-btn>
 
     <v-spacer></v-spacer>
 
@@ -39,12 +39,17 @@
 </template>
 
 <script setup lang="ts">
+import { isCurrentUserAdmin } from '@/_services/helpers/helpers'
 import { useUserAuthStore } from '@/stores/auth.module'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const userAuth = useUserAuthStore()
 const router = useRouter()
+
+const isAdmin = computed(() => {
+  return isCurrentUserAdmin()
+})
 
 const isAuthenticated = computed(() => {
   return userAuth.getIsAuthenticated
