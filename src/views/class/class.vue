@@ -176,7 +176,7 @@ const bookClass = async () => {
   uiStore.setShowOverLay(true)
   try {
     const { data } = await ClassBookingService.bookClass({
-      class_id: selectedClass.value,
+      class_id: selectedClass.value._id,
     })
 
     if (data.success) snackbar.showSuccess('Class booked successfully!')
