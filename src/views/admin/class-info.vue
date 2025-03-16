@@ -81,7 +81,7 @@
             <v-select
               v-if="editMode"
               v-model="classForm.status"
-              :items="['upcoming', 'completed', 'canceled']"
+              :items="['upcoming', 'completed']"
               label="Status"
               class="mb-4"
               :rules="[rules.required]"
@@ -90,6 +90,7 @@
         </v-card-text>
 
         <v-card-actions>
+          <v-btn color="red" @click="confirmCancel">Cancel Class</v-btn>
           <v-btn color="primary" @click="saveClass">Save</v-btn>
           <v-btn color="secondary" @click="dialog = false">Cancel</v-btn>
         </v-card-actions>
@@ -117,6 +118,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import moment from 'moment'
 import { TrainersService } from '@/_services/api/admin/trainers.service'
+import { useUiStore } from '@/stores/ui.module'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -139,6 +141,7 @@ const deleteDialog = ref(false)
 const classToDelete = ref<string | null>(null)
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 const classFormRef = ref<any>(null)
+const uiStore = useUiStore()
 
 const rules = {
   required: (value: any) => !!value || 'This field is required',
@@ -243,6 +246,27 @@ const saveClass = async () => {
     fetchClass()
   } catch (error) {
     snackbar.handleError(error, 'Failed to save class')
+  }
+}
+
+const confirmCancel = () => {
+  uiStore.showConfirmation(
+    'Cancel Class',
+    'Are you sure you want to cancel this class?',
+    cancelClass,
+  )
+}
+
+const cancelClass = async () => {
+  dialog.value = false
+  if (!classForm.value) return
+
+  try {
+    await ClassService.cancelClass({ class_id: classForm.value._id })
+    snackbar.showSuccess('Class Cancelled Successfully')
+    fetchClass()
+  } catch (error) {
+    snackbar.handleError(error, 'Failed to cancel the class')
   }
 }
 
