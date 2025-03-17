@@ -39,6 +39,12 @@ const ClassService = {
 
     return await ApiService.delete(url, id)
   },
+
+  async cancelClass(payload: any) {
+    const url = 'class/cancel'
+
+    return await ApiService.post(url, payload)
+  },
 }
 
 export { ClassService }
