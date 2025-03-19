@@ -46,6 +46,14 @@ export default [
     component: () => lazyLoad('my-bookings'),
   },
   {
+    path: 'create-testimonials',
+    name: 'create-testimonials',
+    meta: {
+      auth: true,
+    },
+    component: () => lazyLoad('create-testimonials'),
+  },
+  {
     path: 'my-profile',
     name: 'my-profile',
     meta: {
