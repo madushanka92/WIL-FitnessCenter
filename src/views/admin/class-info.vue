@@ -36,43 +36,61 @@
       <v-card>
         <v-card-title>{{ editMode ? 'Edit Class' : 'Add Class' }}</v-card-title>
         <v-card-text>
-          <v-text-field v-model="classForm.class_name" label="Class Name" required />
-          <v-select
-            v-model="classForm.trainer_id"
-            :items="trainers"
-            item-title="trainer_full_name"
-            item-value="_id"
-            label="Trainer"
-            required
-          />
-          <v-text-field
-            v-model="classForm.max_capacity"
-            label="Max Capacity"
-            type="number"
-            required
-          />
-          <v-text-field
-            v-model="classForm.start_time"
-            label="Start Time"
-            type="datetime-local"
-            required
-          />
-          <v-text-field
-            v-model="classForm.duration_mins"
-            label="Duration (minutes)"
-            type="number"
-            required
-          />
+          <v-form ref="classFormRef">
+            <v-text-field
+              v-model="classForm.class_name"
+              label="Class Name"
+              :rules="[rules.required]"
+              required
+            />
 
-          <v-select
-            v-if="editMode"
-            v-model="classForm.status"
-            :items="['upcoming', 'completed', 'canceled']"
-            label="Status"
-            class="mb-4"
-          />
+            <v-select
+              v-model="classForm.trainer_id"
+              :items="trainers"
+              item-title="trainer_full_name"
+              item-value="_id"
+              label="Trainer"
+              :rules="[rules.required]"
+              required
+            />
+
+            <v-text-field
+              v-model="classForm.max_capacity"
+              label="Max Capacity"
+              type="number"
+              :rules="[rules.required, rules.positiveNumber]"
+              required
+            />
+
+            <v-text-field
+              v-model="classForm.start_time"
+              label="Start Time"
+              type="datetime-local"
+              :rules="[rules.required]"
+              required
+            />
+
+            <v-text-field
+              v-model="classForm.duration_mins"
+              label="Duration (minutes)"
+              type="number"
+              :rules="[rules.required, rules.positiveNumber]"
+              required
+            />
+
+            <v-select
+              v-if="editMode"
+              v-model="classForm.status"
+              :items="['upcoming', 'completed']"
+              label="Status"
+              class="mb-4"
+              :rules="[rules.required]"
+            />
+          </v-form>
         </v-card-text>
+
         <v-card-actions>
+          <v-btn color="red" @click="confirmCancel">Cancel Class</v-btn>
           <v-btn color="primary" @click="saveClass">Save</v-btn>
           <v-btn color="secondary" @click="dialog = false">Cancel</v-btn>
         </v-card-actions>
@@ -100,6 +118,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import moment from 'moment'
 import { TrainersService } from '@/_services/api/admin/trainers.service'
+import { useUiStore } from '@/stores/ui.module'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -121,6 +140,13 @@ const snackbar = useSnackbarStore()
 const deleteDialog = ref(false)
 const classToDelete = ref<string | null>(null)
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
+const classFormRef = ref<any>(null)
+const uiStore = useUiStore()
+
+const rules = {
+  required: (value: any) => !!value || 'This field is required',
+  positiveNumber: (value: any) => (value > 0 ? true : 'Must be a positive number'),
+}
 
 const headers = ref([
   { title: 'Class Name', value: 'class_name' },
@@ -198,6 +224,9 @@ const openDialog = (
 }
 
 const saveClass = async () => {
+  const { valid } = await classFormRef.value?.validate()
+  if (!valid) return // Stop if validation fails
+
   try {
     if (editMode.value) {
       const payload = {
@@ -217,6 +246,27 @@ const saveClass = async () => {
     fetchClass()
   } catch (error) {
     snackbar.handleError(error, 'Failed to save class')
+  }
+}
+
+const confirmCancel = () => {
+  uiStore.showConfirmation(
+    'Cancel Class',
+    'Are you sure you want to cancel this class?',
+    cancelClass,
+  )
+}
+
+const cancelClass = async () => {
+  dialog.value = false
+  if (!classForm.value) return
+
+  try {
+    await ClassService.cancelClass({ class_id: classForm.value._id })
+    snackbar.showSuccess('Class Cancelled Successfully')
+    fetchClass()
+  } catch (error) {
+    snackbar.handleError(error, 'Failed to cancel the class')
   }
 }
 

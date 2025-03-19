@@ -11,6 +11,12 @@ const MembershipService = {
     }
     return await ApiService.get(url)
   },
+
+  async getMemberShipInfo() {
+    const url = 'memberships/get-user-membership'
+
+    return await ApiService.get(url)
+  },
 }
 
 export { MembershipService }

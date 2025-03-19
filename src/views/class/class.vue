@@ -44,7 +44,7 @@
 
       <template v-slot:item.actions="{ item }">
         <v-btn
-          v-if="item.user_status != 'booked'"
+          v-if="item.user_status != 'booked' || isUserTrainer"
           color="primary"
           @click="openClassDetails(item)"
           width="80"
@@ -78,6 +78,7 @@
         </v-card-text>
         <v-card-actions>
           <v-btn
+            v-if="!isUserTrainer"
             color="green"
             @click="bookClass"
             :disabled="
@@ -93,7 +94,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { debounce } from 'lodash'
 import moment from 'moment'
 import { ClassService } from '@/_services/api/admin/class.service'
@@ -101,6 +102,7 @@ import { useSnackbarStore } from '@/stores/useSnackbarStore'
 import { ClassBookingService } from '@/_services/api/user/class.booking.service'
 import { useUiStore } from '@/stores/ui.module'
 import { nextTick } from 'process'
+import { isCurrentUserTrainer } from '@/_services/helpers/helpers'
 
 const searchQuery = ref('')
 const filterDate = ref<string | null>(null)
@@ -176,7 +178,7 @@ const bookClass = async () => {
   uiStore.setShowOverLay(true)
   try {
     const { data } = await ClassBookingService.bookClass({
-      class_id: selectedClass.value,
+      class_id: selectedClass.value._id,
     })
 
     if (data.success) snackbar.showSuccess('Class booked successfully!')
@@ -212,7 +214,13 @@ const cancelBooking = async (cls: any) => {
   }
 }
 
-onMounted(fetchClasses)
+const isUserTrainer = computed(() => {
+  return isCurrentUserTrainer()
+})
+
+onMounted(() => {
+  fetchClasses()
+})
 </script>
 <style lang="scss">
 .search-fields {

@@ -30,9 +30,7 @@
           </v-card-subtitle>
 
           <v-card-text class="discount-content">
-            <v-chip class="discount-badge">
-              {{ discount.percentage }}% OFF
-            </v-chip>
+            <v-chip class="discount-badge"> {{ discount.percentage }}% OFF </v-chip>
 
             <div class="promo-code">
               <span>Use code:</span>
@@ -122,5 +120,12 @@ onMounted(() => {
   padding: 5px 10px;
   border-radius: 6px;
   display: inline-block;
+}
+
+.discount-content {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>

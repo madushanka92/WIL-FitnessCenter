@@ -2,7 +2,12 @@
   <v-container v-if="post" class="blog-post">
     <!-- Hero Section -->
     <v-card class="hero-card">
-      <v-img v-if="post.blog_image?.length" :src="post.blog_image[0]" class="hero-image" cover>
+      <v-img
+        v-if="post.blog_image && post.blog_image.length"
+        :src="post.blog_image[0]"
+        class="hero-image"
+        cover
+      >
         <div class="overlay d-flex flex-column justify-center align-center">
           <h1 class="text-h3 font-weight-bold text-white text-center">{{ post.title }}</h1>
           <p class="text-white text-subtitle-1 mt-2">
@@ -46,6 +51,8 @@
       </v-col>
     </v-row>
 
+    <!-- Related Post  -->
+    <RelatedPosts :post_id="post_id" />
     <!-- Comments Section -->
     <v-row justify="center" class="mt-6">
       <v-col cols="12" md="8">
@@ -164,6 +171,8 @@ import { BlogService } from '@/_services/api/admin/blog.service'
 import { useUserAuthStore } from '@/stores/auth.module'
 import { getUserID } from '@/_services/helpers/helpers'
 import { useUiStore } from '@/stores/ui.module'
+
+import RelatedPosts from '../../components/relatedPosts.vue'
 
 const route = useRoute()
 const post_id = route.params.id as string
@@ -387,6 +396,7 @@ const deleteComment = async () => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

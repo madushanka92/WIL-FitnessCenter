@@ -1,5 +1,11 @@
 import Cookies from 'js-cookie'
-import { decodeUserId, isTokenExpired, isUserAdmin, isUseraMember } from './tokenDecoder'
+import {
+  decodeUserId,
+  isTokenExpired,
+  isUserAdmin,
+  isUseraMember,
+  isUserTrainer,
+} from './tokenDecoder'
 
 export function getToken(): string | null {
   return Cookies.get('token') || null
@@ -19,4 +25,8 @@ export function getUserID() {
 
 export function getUserMembership() {
   return isUseraMember(getToken() ?? '')
+}
+
+export function isCurrentUserTrainer(): boolean {
+  return isUserTrainer(getToken() ?? '')
 }
