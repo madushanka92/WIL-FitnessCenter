@@ -75,4 +75,20 @@ export default [
     },
     component: () => lazyLoad('blog-form'),
   },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('dashboard'),
+  },
+  {
+    path: '/membership',
+    name: 'membership',
+    meta: {
+      isAdmin: true,
+    },
+    component: () => lazyLoad('membership'),
+  },
 ]

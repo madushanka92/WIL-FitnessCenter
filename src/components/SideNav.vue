@@ -7,24 +7,47 @@
           <v-list-item-title class="text-h6">Admin Panel</v-list-item-title>
         </v-list-item>
         <v-divider />
-        <v-list-item title="Dashboard" prepend-icon="mdi-view-dashboard" to="/" />
-        <v-list-item title="Profile" prepend-icon="mdi-account" to="/profile" />
-        <!-- <v-list-item title="Settings" prepend-icon="mdi-cog" to="/settings" /> -->
-        <v-list-item title="View Users" prepend-icon="mdi-account-group" to="/view-users" />
+        <v-list-item
+          title="Dashboard"
+          prepend-icon="mdi-view-dashboard"
+          @click="goToNext('/dashboard')"
+        />
+        <v-list-item
+          title="View Users"
+          prepend-icon="mdi-account-group"
+          @click="goToNext('/view-users')"
+        />
         <v-list-item
           title="User Roles"
           prepend-icon="mdi-account-multiple-outline"
-          to="/user-roles"
+          @click="goToNext('/user-roles')"
         />
-        <v-list-item title="Class" prepend-icon="mdi-human-capacity-decrease" to="/admin-class" />
-        <v-list-item title="Trainers" prepend-icon="mdi-weight-lifter" to="/trainers" />
-        <v-list-item title="Promotion" prepend-icon="mdi-sale" to="/promotionAdmin" />
+        <v-list-item
+          title="Class"
+          prepend-icon="mdi-human-capacity-decrease"
+          @click="goToNext('/admin-class')"
+        />
+        <v-list-item
+          title="Trainers"
+          prepend-icon="mdi-weight-lifter"
+          @click="goToNext('/trainers')"
+        />
+        <v-list-item
+          title="Promotion"
+          prepend-icon="mdi-sale"
+          @click="goToNext('/promotionAdmin')"
+        />
+        <v-list-item title="Membership" prepend-icon="mdi-crowd" @click="goToNext('/membership')" />
         <v-list-item
           title="Testimonials"
           prepend-icon="mdi-account-voice"
-          to="/view-testimonials"
+          @click="goToNext('/view-testimonials')"
         />
-        <v-list-item title="Manage Blogs" prepend-icon="mdi-post-outline" to="/manage-blogs" />
+        <v-list-item
+          title="Manage Blogs"
+          prepend-icon="mdi-post-outline"
+          @click="goToNext('/manage-blogs')"
+        />
 
         <v-divider />
         <v-list-item title="Logout" prepend-icon="mdi-logout" @click="logout" />
@@ -38,11 +61,18 @@
   </v-app>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useUserAuthStore } from '@/stores/auth.module'
+import { useRouter } from 'vue-router'
 
 const userAuth = useUserAuthStore()
 const logout = () => {
   userAuth.setIsAuthenticated(false)
+}
+
+const router = useRouter()
+
+const goToNext = (page: any) => {
+  router.push(page)
 }
 </script>
