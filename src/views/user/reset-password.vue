@@ -1,6 +1,6 @@
 <template>
   <v-container class="d-flex justify-center align-center fill-height reset-password">
-    <v-card class="pa-6" elevation="10" min-width="500">
+    <v-card class="pa-6" elevation="10" min-width="600">
       <v-card-title class="text-h5 text-center">Reset Your Password</v-card-title>
       <v-card-subtitle class="text-center">
         Enter a new password for your account.

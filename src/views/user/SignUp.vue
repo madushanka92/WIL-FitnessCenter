@@ -1,6 +1,6 @@
 <template>
   <v-container class="d-flex justify-center align-center fill-height user-sign-up">
-    <v-card class="pa-6" elevation="10" min-width="500">
+    <v-card class="pa-6" elevation="10" min-width="600">
       <v-card-title class="text-h5 text-center">Create an Account</v-card-title>
 
       <v-form ref="form" v-model="isValid">
@@ -45,7 +45,7 @@
           :rules="[rules.required, rules.password]"
           outlined
           prepend-inner-icon="mdi-lock"
-          maxlength="8"
+          maxlength="16"
         >
           <template v-slot:append>
             <v-btn icon @click="showPassword = !showPassword">
@@ -62,7 +62,7 @@
           :rules="[rules.required, rules.confirmPassword]"
           outlined
           prepend-inner-icon="mdi-lock-check"
-          maxlength="8"
+          maxlength="16"
         ></v-text-field>
 
         <!-- Phone Number -->
@@ -78,7 +78,7 @@
 
         <!-- Submit Button -->
         <v-btn color="primary" block class="mt-4" :disabled="!isValid" @click="submitForm">
-          <v-icon left>mdi-account-plus</v-icon> &nbsp; Sign Up
+          <v-icon>mdi-account-plus</v-icon> &nbsp; Sign Up
         </v-btn>
 
         <v-alert :text="alertText" :type="alertType" closable v-if="alertText"></v-alert>
@@ -109,11 +109,14 @@ const alertType = ref('success')
 const rules = {
   required: (v: string) => !!v || 'This field is required',
   email: (v: string) =>
-    /^(?!.*\.{2})(?!.*\.$)(?!^\.)[a-zA-Z0-9._%+-]+(?<!\.)@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+    /^(?!.*\.\.)(?!.*\.$)(?!^\.)[a-zA-Z0-9._%+-]+(?<!\.)@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
       v.trim(),
     ) || 'Invalid email format',
   password: (v: string) =>
-    (v.length === 8 && /^.{8}$/.test(v)) || 'Password must be exactly 8 characters long',
+    (v.length >= 8 &&
+      v.length <= 16 &&
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(v)) ||
+    'Password must be 8-16 characters long, with letters, numbers, and a special character',
   confirmPassword: (v: string) => v === password.value || 'Password does not match',
   phone: (v: string) =>
     /^(?:\+1|1)?(?:[2-9][0-9]{2})[2-9][0-9]{6}$/.test(v) ||
@@ -126,7 +129,6 @@ const rules = {
 
 const submitForm = () => {
   if (form.value?.validate()) {
-    // alert('Account Created Successfully!');
     userSignUp()
   }
 }
@@ -146,6 +148,7 @@ const userSignUp = async () => {
       if (res && res.data?.message) {
         alertType.value = 'success'
         alertText.value = res.data?.message
+        form.value?.reset()
       }
     })
     .catch((err: any) => {
