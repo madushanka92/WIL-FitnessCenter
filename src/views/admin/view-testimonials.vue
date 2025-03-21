@@ -61,7 +61,9 @@
         <v-card-text>Are you sure you want to approve this testimonial?</v-card-text>
         <v-card-actions>
           <v-btn color="gray" @click="approveDialog = false">Cancel</v-btn>
-          <v-btn color="green" @click="approveTestimonial">Approve</v-btn>
+          <v-btn color="green" @click="approveTestimonial" :disabled="item.isApproved"
+            >Approve</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
