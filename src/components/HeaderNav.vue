@@ -5,11 +5,11 @@
 
     <!-- Navigation Links -->
     <v-spacer></v-spacer>
-    <v-btn text to="/home" v-if="!isAdmin">Home</v-btn>
-    <v-btn text to="/class-list" v-if="!isAdmin && isAuthenticated">Classes</v-btn>
-    <v-btn text to="/trainers-list" v-if="!isAdmin">Trainers</v-btn>
-    <v-btn text to="/membership-list" v-if="!isAdmin">Membership</v-btn>
-    <v-btn text to="/blog-list" v-if="!isAdmin">Blog</v-btn>
+    <v-btn text @click="goToNext('/home')" v-if="!isAdmin">Home</v-btn>
+    <v-btn text @click="goToNext('/class-list')" v-if="!isAdmin && isAuthenticated">Classes</v-btn>
+    <v-btn text @click="goToNext('/trainers-list')" v-if="!isAdmin">Trainers</v-btn>
+    <v-btn text @click="goToNext('/membership-list')" v-if="!isAdmin">Membership</v-btn>
+    <v-btn text @click="goToNext('/blog-list')" v-if="!isAdmin">Blog</v-btn>
 
     <v-spacer></v-spacer>
 
@@ -23,18 +23,24 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item to="/my-profile">Profile</v-list-item>
-        <v-list-item to="/my-bookings" v-if="!isAdmin">My Bookings</v-list-item>
-        <v-list-item to="/create-testimonials" v-if="!isAdmin">Testimonials</v-list-item>
-        <v-list-item to="/my-payments" v-if="!isAdmin">Payments</v-list-item>
+        <v-list-item @click="goToNext('/my-profile')">Profile</v-list-item>
+        <v-list-item @click="goToNext('/my-bookings')" v-if="!isAdmin">My Bookings</v-list-item>
+        <v-list-item @click="goToNext('/create-testimonials')" v-if="!isAdmin"
+          >Testimonials</v-list-item
+        >
+        <v-list-item @click="goToNext('/my-payments')" v-if="!isAdmin">Payments</v-list-item>
         <v-list-item @click="logout">Logout</v-list-item>
       </v-list>
     </v-menu>
 
     <!-- Login & Sign Up Buttons (Visible if Not Authenticated) -->
     <div v-else class="auth-buttons">
-      <v-btn to="/login" color="secondary" class="mx-2">Login</v-btn>
-      <v-btn to="/signup" color="accent" class="mx-2">Sign Up</v-btn>
+      <v-btn to="/login" @click="goToNext('/promotionAdmin')" color="secondary" class="mx-2"
+        >Login</v-btn
+      >
+      <v-btn to="/signup" @click="goToNext('/promotionAdmin')" color="accent" class="mx-2"
+        >Sign Up</v-btn
+      >
     </div>
   </v-app-bar>
 </template>
@@ -62,6 +68,10 @@ watch(isAuthenticated, (newVal: boolean) => {
 
 const logout = () => {
   userAuth.setIsAuthenticated(false)
+}
+
+const goToNext = (page: any) => {
+  router.push(page)
 }
 </script>
 

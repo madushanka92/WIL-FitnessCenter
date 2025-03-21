@@ -37,4 +37,9 @@ a,
 
 body {
   justify-content: center;
+  /* background: linear-gradient(to right, #89b2d6, #02edf8); */
+}
+
+.v-application {
+  background: unset !important;
 }

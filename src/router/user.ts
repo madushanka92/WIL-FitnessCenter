@@ -10,7 +10,7 @@ export default [
   {
     path: 'login',
     name: 'user-log-in',
-    component: () => lazyLoad('Login'),
+    component: () => lazyLoad('login'),
   },
   {
     path: 'verify-email/:token',

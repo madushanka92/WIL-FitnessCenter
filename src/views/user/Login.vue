@@ -1,7 +1,9 @@
 <template>
   <v-container class="d-flex justify-center align-center fill-height user-login">
-    <v-card class="pa-6" elevation="10" min-width="560">
-      <v-card-title class="text-h5 text-center" data-test="login-header">Login</v-card-title>
+    <v-card class="pa-8" elevation="12" min-width="600" max-width="800" rounded="lg">
+      <v-card-title class="text-h5 text-center mb-4" data-test="login-header"
+        >Welcome Back</v-card-title
+      >
 
       <v-form ref="form" v-model="isValid">
         <!-- Email -->
@@ -27,19 +29,19 @@
           data-test="password-input"
         >
           <template v-slot:append>
-            <v-btn icon @click="showPassword = !showPassword">
+            <v-btn icon variant="text" @click="showPassword = !showPassword">
               <v-icon>{{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
             </v-btn>
           </template>
         </v-text-field>
 
         <!-- Remember Me & Forgot Password -->
-        <v-row align="center">
+        <v-row align="center" class="mb-4">
           <v-col cols="6">
             <v-checkbox v-model="rememberMe" label="Remember Me" dense></v-checkbox>
           </v-col>
           <v-col cols="6" class="text-right">
-            <v-btn variant="text" color="primary" to="/forgot-password"> Forgot Password? </v-btn>
+            <v-btn variant="text" color="primary" to="/forgot-password">Forgot Password?</v-btn>
           </v-col>
         </v-row>
 
@@ -47,24 +49,32 @@
         <v-btn
           color="primary"
           block
-          class="mt-4"
+          class="mb-4"
+          size="large"
+          rounded="lg"
           :disabled="!isValid"
           @click="login($event)"
           data-test="login-btn"
         >
-          <v-icon left>mdi-login</v-icon> Login
+          <v-icon left>mdi-login</v-icon>Login
         </v-btn>
 
-        <!-- Go to Sign Up Button -->
-        <v-card-text class="text-center mt-2">
-          <v-btn variant="text" color="primary" to="/signup">
-            Don't have an account? Sign Up
-          </v-btn>
-        </v-card-text>
+        <!-- Go to Sign Up -->
+        <p class="text-center">
+          Don't have an account?
+          <v-btn variant="text" color="primary" to="/signup" class="sign-up-link">Sign Up</v-btn>
+        </p>
 
-        <v-alert :text="alertText" :type="alertType" closable v-if="alertText"></v-alert>
+        <!-- Alerts -->
+        <v-alert
+          :text="alertText"
+          :type="alertType"
+          closable
+          v-if="alertText"
+          class="mt-4"
+        ></v-alert>
 
-        <!-- Resend Verification Email Button -->
+        <!-- Resend Verification Email -->
         <v-btn
           v-if="!isVerified"
           color="secondary"
@@ -80,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Cookies from 'js-cookie'
 import { UserService } from '@/_services/api/user/user.service'
 import { useUserAuthStore } from '@/stores/auth.module'
@@ -98,10 +108,9 @@ const form = ref()
 const alertText = ref(undefined)
 const alertType = ref('success')
 const router = useRouter()
-
 const userAuth = useUserAuthStore()
 const snackbar = useSnackbarStore()
-const isVerified = ref(true) // Assume true by default
+const isVerified = ref(true)
 const uiStore = useUiStore()
 
 const rules = {
@@ -115,8 +124,6 @@ const rules = {
 const login = (event: Event) => {
   event.preventDefault()
   if (form.value?.validate()) {
-    // alert('Login Successful!')
-
     if (rememberMe.value) {
       Cookies.set('rememberMe', email.value, { expires: 7 }) // Expires in 7 days
     } else {
@@ -171,15 +178,6 @@ const userLogIn = async () => {
 }
 
 const resendVerificationEmail = async () => {
-  // try {
-  //   const verificationToken = await UserService.getUserVerificationToken({ email: email.value })
-  // } catch (err: any) {
-  //   if (err && err.data?.message) {
-  //     alertType.value = 'error'
-  //     alertText.value = err.data?.message
-  //   }
-  // }
-
   uiStore.setShowOverLay(true)
   await UserService.getUserVerificationToken(email.value)
     .then(async (res: any) => {
@@ -208,15 +206,6 @@ const resendVerificationEmail = async () => {
         alertText.value = err.data?.message
       }
     })
-
-  // .then(() => {
-  //   alertType.value = 'success'
-  //   alertText.value = 'Verification email resent successfully!'
-  // })
-  // .catch(() => {
-  //   alertType.value = 'error'
-  //   alertText.value = 'Failed to resend verification email. Please try again later.'
-  // })
 }
 
 onMounted(() => {
@@ -233,21 +222,17 @@ onMounted(() => {
   height: 100vh;
 }
 
-.forgot-password,
+// .user-login {
+//   background: linear-gradient(to right, #4facfe, #00f2fe);
+// }
+
 .sign-up-link {
   color: #1976d2;
-  text-decoration: none;
   font-weight: 500;
+  text-decoration: none;
 }
 
-.forgot-password:hover,
 .sign-up-link:hover {
   text-decoration: underline;
-}
-
-.user-login {
-  > div {
-    min-width: 560px;
-  }
 }
 </style>

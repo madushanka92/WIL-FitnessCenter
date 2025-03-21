@@ -1,6 +1,6 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-card v-if="isTokenValid" class="pa-5 text-center" elevation="5" max-width="400">
+    <v-card v-if="isTokenValid" class="pa-5 text-center" elevation="5" min-width="500">
       <v-icon color="success" size="50">mdi-check-circle</v-icon>
       <h2 class="mt-2">Email Verified!</h2>
       <p>Your email has been successfully verified. You can now proceed.</p>
