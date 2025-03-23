@@ -22,8 +22,8 @@
     </v-row>
 
     <!-- Call to Action -->
-    <v-row justify="center" class="mt-12">
-      <v-btn to="/signup" color="primary" size="x-large" :disabled="isAuthenticated" elevation="4">
+    <v-row justify="center" class="mt-12" v-if="!isAuthenticated">
+      <v-btn @click="goToNext('/signup')" color="primary" size="x-large" elevation="4">
         Get Started Today
       </v-btn>
     </v-row>
@@ -33,9 +33,15 @@
 <script setup lang="ts">
 import { useUserAuthStore } from '@/stores/auth.module'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const userAuth = useUserAuthStore()
 const isAuthenticated = computed(() => userAuth.getIsAuthenticated)
+const router = useRouter()
+
+const goToNext = (page: any) => {
+  router.push(page)
+}
 
 const stats = [
   {

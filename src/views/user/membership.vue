@@ -34,7 +34,7 @@
                 color="primary"
                 variant="flat"
                 @click="SelectMembership(membership)"
-                :disabled="membershipID || membershipID === membership._id"
+                :disabled="membershipID || membershipID === membership._id ? true : false"
               >
                 {{ membershipID === membership._id ? 'Active Membership' : 'Choose Plan' }}
               </v-btn>
@@ -91,7 +91,7 @@ import { nextTick } from 'process'
 import { UserService } from '@/_services/api/user/user.service'
 import { getUserID, getUserMembership } from '@/_services/helpers/helpers'
 import { useUiStore } from '@/stores/ui.module'
-import DisplayDiscounts from "../../components/DisplayDiscounts.vue";
+import DisplayDiscounts from '../../components/DisplayDiscounts.vue'
 
 const filteredMemberships = ref([] as any)
 const snackbar = useSnackbarStore()

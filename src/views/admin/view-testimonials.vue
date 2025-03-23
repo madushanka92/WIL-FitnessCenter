@@ -17,7 +17,9 @@
         <div class="d-flex justify-end">
           <!-- <v-icon @click="openEditDialog(item)" class="mr-2">mdi-pencil</v-icon> -->
           <v-icon @click="confirmDelete(item)" color="red" class="mr-2">mdi-delete</v-icon>
-          <v-icon @click="confirmApprove(item)" color="blue">mdi-check-decagram-outline</v-icon>
+          <v-icon v-if="!item.isApproved" @click="confirmApprove(item)" color="blue"
+            >mdi-check-decagram-outline</v-icon
+          >
         </div>
       </template>
       <template v-slot:item.status="{ item }">
@@ -61,9 +63,7 @@
         <v-card-text>Are you sure you want to approve this testimonial?</v-card-text>
         <v-card-actions>
           <v-btn color="gray" @click="approveDialog = false">Cancel</v-btn>
-          <v-btn color="green" @click="approveTestimonial" :disabled="item.isApproved"
-            >Approve</v-btn
-          >
+          <v-btn color="green" @click="approveTestimonial">Approve</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -184,6 +184,7 @@ const deleteTestimonial = async () => {
 
 // Confirm approve testimonial
 const confirmApprove = (testimonial) => {
+  console.log('A . ', testimonial)
   testimonialToApprove.value = testimonial // Store testimonial to approve
   approveDialog.value = true
 }

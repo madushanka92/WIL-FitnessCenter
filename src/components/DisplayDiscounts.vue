@@ -59,7 +59,7 @@ const discounts = ref([])
 const fetchDiscounts = async () => {
   try {
     const response = await DiscountService.getAllDiscounts()
-    discounts.value = response.data.promotions
+    discounts.value = response.data.promotions.filter((x: any) => x.isActive)
   } catch (error) {
     console.error('Error fetching discounts:', error)
   }

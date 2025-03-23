@@ -37,8 +37,23 @@
           isEditing ? 'Edit Promotion' : 'Generate Promotion'
         }}</v-card-title>
         <v-card-text>
-          <v-text-field v-model="percentage" label="Discount (%)" type="number" min="1" max="100" />
-          <v-text-field v-model="expiryDate" label="Expiry Date" type="date" :min="minDate" />
+          <v-form ref="promoFormRef">
+            <v-text-field
+              v-model="percentage"
+              label="Discount (%)"
+              type="number"
+              :min="1"
+              :max="99.99"
+              :rules="[rules.required, rules.minValue, rules.maxValue]"
+            />
+            <v-text-field
+              v-model="expiryDate"
+              label="Expiry Date"
+              type="date"
+              :min="minDate"
+              :rules="[rules.required]"
+            />
+          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-btn color="gray" @click="editDialog = false">Cancel</v-btn>
@@ -56,10 +71,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { PromotionService } from '@/_services/api/admin/promotion.service'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
+import { useUiStore } from '@/stores/ui.module'
 
 const searchQuery = ref('')
 const promotions = ref([])
@@ -72,6 +88,15 @@ const percentage = ref('')
 const expiryDate = ref('')
 const promoId = ref(null)
 const snackbar = useSnackbarStore()
+const promoFormRef = ref<any>(null)
+
+const uiStore = useUiStore()
+
+const rules = {
+  required: (value: any) => !!value || 'This field is required',
+  minValue: (value: any) => (value !== null && value >= 1) || 'Discount must be at least 1%',
+  maxValue: (value: any) => (value !== null && value <= 99.99) || 'Discount must be below 100%',
+}
 
 const minDate = ref('')
 
@@ -108,8 +133,11 @@ async function fetchPromotions() {
       ...promo,
       expiryDate: promo.expiryDate.split('T')[0], // Extract only YYYY-MM-DD
     }))
+
+    uiStore.setShowOverLay(false)
   } catch (error) {
     snackbar.handleError(error, 'Failed to fetch promotions')
+    uiStore.setShowOverLay(false)
   }
 }
 
@@ -142,10 +170,15 @@ const openGenerateDialog = () => {
 
 // Create a new promotion
 const createPromotion = async () => {
+  const { valid } = await promoFormRef.value?.validate()
+  if (!valid) return // Stop if validation fails
+
   if (!percentage.value || !expiryDate.value) {
-    snackbar.showError('Please enter discount percentage and expiry date.')
+    snackbar.notify('Please enter discount percentage and expiry date.', 'error')
     return
   }
+
+  uiStore.setShowOverLay(true)
 
   try {
     await PromotionService.createRandomPromotion(percentage.value, expiryDate.value)
@@ -154,6 +187,8 @@ const createPromotion = async () => {
     fetchPromotions()
   } catch (error) {
     snackbar.handleError(error, 'Failed to create promotion')
+
+    uiStore.setShowOverLay(false)
   }
 }
 
@@ -172,11 +207,15 @@ const openEditDialog = (promo) => {
 
 // Update an existing promotion
 const updatePromotion = async () => {
+  const { valid } = await promoFormRef.value?.validate()
+  if (!valid) return // Stop if validation fails
+
   if (!percentage.value || !expiryDate.value) {
-    snackbar.showError('All fields are required')
+    snackbar.notify('All fields are required', 'error')
     return
   }
 
+  uiStore.setShowOverLay(true)
   try {
     await PromotionService.updatePromotion(
       promoId.value,
@@ -190,6 +229,7 @@ const updatePromotion = async () => {
     fetchPromotions()
   } catch (error) {
     snackbar.handleError(error, 'Failed to update promotion')
+    uiStore.setShowOverLay(false)
   }
 }
 

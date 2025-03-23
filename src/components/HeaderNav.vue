@@ -35,12 +35,8 @@
 
     <!-- Login & Sign Up Buttons (Visible if Not Authenticated) -->
     <div v-else class="auth-buttons">
-      <v-btn to="/login" @click="goToNext('/promotionAdmin')" color="secondary" class="mx-2"
-        >Login</v-btn
-      >
-      <v-btn to="/signup" @click="goToNext('/promotionAdmin')" color="accent" class="mx-2"
-        >Sign Up</v-btn
-      >
+      <v-btn @click="goToNext('/login')" color="secondary" class="mx-2">Login</v-btn>
+      <v-btn @click="goToNext('/signup')" color="accent" class="mx-2">Sign Up</v-btn>
     </div>
   </v-app-bar>
 </template>
