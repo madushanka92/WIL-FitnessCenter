@@ -5,12 +5,12 @@ export default [
   {
     path: 'signup',
     name: 'user-sign-up',
-    component: () => lazyLoad('SignUp'),
+    component: () => lazyLoad('sign-up'),
   },
   {
     path: 'login',
     name: 'user-log-in',
-    component: () => lazyLoad('login'),
+    component: () => lazyLoad('login-page'),
   },
   {
     path: 'verify-email/:token',

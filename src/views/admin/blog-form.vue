@@ -5,14 +5,14 @@
         {{ isEditing ? 'Edit Blog Post' : 'Create Blog Post' }}
       </h2>
 
-      <v-form @submit.prevent="handleSubmit" class="d-flex flex-column gap-4">
+      <v-form @submit.prevent="handleSubmit" class="d-flex flex-column gap-4" ref="blogForm">
         <v-text-field
           v-model="form.title"
           label="Blog Title"
           prepend-inner-icon="mdi-pencil"
           outlined
           dense
-          required
+          :rules="[rules.required]"
         />
 
         <QuillEditor
@@ -23,6 +23,7 @@
           :toolbar="fullToolbarOptions"
           :modules="quillModules"
         />
+        <p v-if="contentError" class="error-message">{{ contentError }}</p>
 
         <v-text-field
           v-model="form.author"
@@ -30,7 +31,7 @@
           prepend-inner-icon="mdi-account"
           outlined
           dense
-          required
+          :rules="[rules.required]"
         />
 
         <!-- Thumbnail Image Upload -->
@@ -41,6 +42,7 @@
           outlined
           dense
           prepend-icon="mdi-image"
+          :rules="[rules.imageRequired]"
         />
 
         <!-- Thumbnail Preview -->
@@ -76,16 +78,23 @@ const router = useRouter()
 const uploadedImages = ref<string[]>([])
 const uiStore = useUiStore()
 const snackbar = useSnackbarStore()
-
 const isEditing = ref(false)
+const contentError = ref<string>('')
 const form = ref({
   title: '',
   content: '',
   author: '',
-  thumbnail: '', // This will hold the thumbnail image URL
+  thumbnail: '',
 })
 const selectedFile = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
+const blogForm = ref<any>(null)
+
+const rules = {
+  required: (value: string) => !!value || 'This field is required',
+  imageRequired: () =>
+    isEditing.value || selectedFile.value || 'Thumbnail is required for new blogs',
+}
 
 onMounted(async () => {
   if (route.params.id) {
@@ -115,13 +124,20 @@ const handleFileChange = (event: any) => {
   const file = event.target.files[0]
   if (file) {
     selectedFile.value = file
-
-    // Generate a local preview URL for the image
     previewUrl.value = URL.createObjectURL(file)
   }
 }
 
 const handleSubmit = async () => {
+  const valid = await blogForm.value.validate()
+  if (!valid) return
+
+  if (!form.value.content.trim()) {
+    contentError.value = 'Blog content is required'
+    return
+  }
+  contentError.value = ''
+
   // Handle uploaded images inside the content first
   const contentImages = Array.from(
     new DOMParser().parseFromString(form.value.content, 'text/html').querySelectorAll('img'),
@@ -134,8 +150,6 @@ const handleSubmit = async () => {
   for (const imageUrl of imagesToRemove) {
     await removeImage(imageUrl)
   }
-
-  // Now prepare form data (with file)
   const formData = new FormData()
   formData.append('title', form.value.title)
   formData.append('content', form.value.content)
@@ -145,7 +159,6 @@ const handleSubmit = async () => {
     formData.append('blog_images', selectedFile.value)
   }
 
-  // Call API
   uiStore.setShowOverLay(true)
   try {
     if (isEditing.value) {
@@ -209,10 +222,11 @@ const quillModules = {
 </script>
 
 <style lang="scss">
-// .quill-editor {
-//   min-height: 200px;
-//   border: 1px solid #ccc;
-// }
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 4px;
+}
 
 .blog-form {
   div.ql-container.ql-snow {

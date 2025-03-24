@@ -41,7 +41,9 @@
             <v-checkbox v-model="rememberMe" label="Remember Me" dense></v-checkbox>
           </v-col>
           <v-col cols="6" class="text-right">
-            <v-btn variant="text" color="primary" to="/forgot-password">Forgot Password?</v-btn>
+            <v-btn variant="text" color="primary" @click="goToNext('/forgot-password')"
+              >Forgot Password?</v-btn
+            >
           </v-col>
         </v-row>
 
@@ -62,7 +64,9 @@
         <!-- Go to Sign Up -->
         <p class="text-center">
           Don't have an account?
-          <v-btn variant="text" color="primary" to="/signup" class="sign-up-link">Sign Up</v-btn>
+          <v-btn variant="text" color="primary" @click="goToNext('/signup')" class="sign-up-link"
+            >Sign Up</v-btn
+          >
         </p>
 
         <!-- Alerts -->
@@ -96,7 +100,7 @@ import { UserService } from '@/_services/api/user/user.service'
 import { useUserAuthStore } from '@/stores/auth.module'
 import { useSnackbarStore } from '@/stores/useSnackbarStore'
 import { useRouter } from 'vue-router'
-import { getUserMembership } from '@/_services/helpers/helpers'
+import { getUserMembership, isCurrentUserAdmin } from '@/_services/helpers/helpers'
 import { useUiStore } from '@/stores/ui.module'
 
 const email = ref('')
@@ -112,6 +116,10 @@ const userAuth = useUserAuthStore()
 const snackbar = useSnackbarStore()
 const isVerified = ref(true)
 const uiStore = useUiStore()
+
+const goToNext = (page: any) => {
+  router.push(page)
+}
 
 const rules = {
   required: (v: string) => !!v || 'This field is required',
@@ -161,7 +169,14 @@ const userLogIn = async () => {
 
       snackbar.notify('Redirecting...', 'success')
       if (membershipID.value) setTimeout(() => router.push('/home'), 500)
-      else setTimeout(() => router.push('/membership-list'), 500)
+      else
+        setTimeout(() => {
+          if (isCurrentUserAdmin()) {
+            router.push('/dashboard')
+          } else {
+            router.push('/membership-list')
+          }
+        }, 500)
     })
     .catch((err: any) => {
       if (err && err.data?.message) {

@@ -66,8 +66,9 @@
               v-model="classForm.start_time"
               label="Start Time"
               type="datetime-local"
-              :rules="[rules.required]"
+              :rules="[rules.required, rules.minDate]"
               required
+              :min="minDate"
             />
 
             <v-text-field
@@ -90,7 +91,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn color="red" @click="confirmCancel">Cancel Class</v-btn>
+          <v-btn color="red" @click="confirmCancel" v-if="editMode">Cancel Class</v-btn>
           <v-btn color="primary" @click="saveClass">Save</v-btn>
           <v-btn color="secondary" @click="dialog = false">Cancel</v-btn>
         </v-card-actions>
@@ -143,9 +144,26 @@ let searchTimeout: ReturnType<typeof setTimeout> | null = null
 const classFormRef = ref<any>(null)
 const uiStore = useUiStore()
 
+const minDate = ref('')
+
+const setMinDate = () => {
+  const date = new Date()
+  date.setDate(date.getDate() + 1)
+  const formattedDate = date.toISOString().slice(0, 16) // Format to 'YYYY-MM-DDTHH:mm'
+  minDate.value = formattedDate
+}
+
+setMinDate()
+
 const rules = {
   required: (value: any) => !!value || 'This field is required',
   positiveNumber: (value: any) => (value > 0 ? true : 'Must be a positive number'),
+  minDate: (value: string) => {
+    const selectedDate = new Date(value)
+    const minAllowedDate = new Date()
+    minAllowedDate.setDate(minAllowedDate.getDate() + 1)
+    return selectedDate >= minAllowedDate || 'Date must be at least one day from today'
+  },
 }
 
 const headers = ref([
